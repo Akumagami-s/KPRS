@@ -2,7 +2,7 @@
     <div class="page-title">
         <div class="row">
             <div class="col-6">
-                <h3 class="text-secondary"><u>Menu</u></h3>
+                <h3 class="text-secondary"><u>@yield('dashboard')</u></h3>
             </div>
             <div class="col-6">
                 <ol class="breadcrumb">
@@ -87,6 +87,14 @@
                     @if(request()->is('admin/detaildata/pending'))
                         <li class="breadcrumb-item">Pinjaman</li>
                         <li class="breadcrumb-item">Manual</li>
+                    @endif
+                    @if(request()->is('admin/rumah'))
+                        <li class="breadcrumb-item">Management Rumah</li>
+                        <li class="breadcrumb-item">Rumah</li>
+                    @endif
+                    @if(request()->is('admin/fasilitas'))
+                        <li class="breadcrumb-item">Management Rumah</li>
+                        <li class="breadcrumb-item">Fasilitas</li>
                     @endif
                 </ol>
             </div>

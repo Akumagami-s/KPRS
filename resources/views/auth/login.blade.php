@@ -1,20 +1,79 @@
 @extends('layouts.loglayout', ['title' => 'Sign In'])
 @section('content')
+<style>
+    .form-login {
+        margin-top: 1rem;
+    }
+    
+    @media (min-width: 320px) and (max-width: 480px) {
+      .logo-tni
+      {
+          max-width: 100% !important;  
+          height: auto !important;  
+          /*margin-top: 0px;*/
+          margin: 0px 60px 30px 100px;
+      }
+      .logo-btn
+      {
+         max-width: 100% !important;  
+            height: auto !important;  
+          /*margin-top: 0px;*/
+          margin: 0px 60px 30px 100px;
+      }
+    }
+    @media (min-width: 700px) {
+      .logo-btn
+      {
+          margin-top: 100px;
+      }
+    }
+    
+    @media screen and (min-width: 768px) {
+        .form-login {
+            margin-top: 4rem;
+        }
+    }
+</style>
 <div class="content">
   <div class="container">
-    <div class="row mt-5">
-      <div class="col-md-6">
-        <img src="{{asset('assets/images/ditkuad.png')}}" alt="Image" class="img-fluid">
+    <div class="row form-login">
+      <div class="col-3">
+        <img src="{{asset('assets/images/fixlogo.png')}}" alt="logoweb" class="img-fluid logo-tni">
       </div>
-      <div class="col-md-6 contents">
+      <div class="col-3 mt-5">
+        <img src="{{ asset('assets/images/btnlogo.jpg') }}" alt="logoweb"  class="img-fluid logo-btn">
+      </div>
+      <div class="col-md-6 col-sm-12 contents mt-5">
         <div class="row justify-content-center">
           <div class="col-md-8">
             <div class="mb-4">
-            <h3>Sign In</h3>
-            <p class="mb-4">Silahkan login untuk melanjutkan.</p>
+            <h1>Login</h1>
+            <h5 class="mb-4 text-dark">Silahkan login untuk melanjutkan.</h5>
           </div>
-          <form action="{{ route('login') }}" method="post" autocomplete="off">
-            @csrf
+            @if (session()->has('error'))
+                <div class="alert alert-danger mt-1 alert-dismissible" role="alert">
+                    <div class="alert-body">
+                        <i class="fa fa-info"></i>
+                        <span>{{ session('error') }}</span>
+                    </div>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            @endif
+            @error('throttle')
+                <div class="alert alert-danger mt-1 alert-dismissible" role="alert">
+                    <div class="alert-body">
+                        <i class="fa fa-info"></i>
+                        <span>{{ $message }}</span>
+                    </div>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            @enderror
+          <form action="{{ route('login') }}" method="post" >
+            {{ csrf_field() }}
             <div class="form-group">
               <label for="nrp">NRP</label>
               <input class="form-control @error('nrp') is-invalid @enderror" type="number" name="nrp" id="nrp" autofocus required>
@@ -27,11 +86,6 @@
             <div class="form-group">
               <label for="password">Password</label>
               <input class="form-control" type="password" name="password" id="password" required>
-              @error('password')
-                  <span class="invalid-feedback" role="alert">
-                      <strong>{{ $message }}</strong>
-                  </span>
-              @enderror
             </div>
             
             <div class="d-flex mb-5 mt-2 align-items-center">

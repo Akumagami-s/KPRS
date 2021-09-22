@@ -6,9 +6,13 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable implements MustVerifyEmail
+class User extends Authenticatable 
 {
     use Notifiable;
+
+
+    protected $connection = 'login';
+    protected $table = 'users';
 
     /**
      * The attributes that are mass assignable.
@@ -16,7 +20,7 @@ class User extends Authenticatable implements MustVerifyEmail
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'nrp', 'password', 'role', 'avatar', 'pangkat_id', 'status_verif'
+        'name', 'email', 'nrp', 'password', 'role', 'avatar', 'pangkat', 'status_verif', 'darkmode','last_session'
     ];
 
     public function bunga()
@@ -59,6 +63,7 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return "/storage/" . $this->avatar;
     }
+    
     public function getRoleSectionAttribute()
     {
         if ($this->role == '0') {
@@ -71,6 +76,33 @@ class User extends Authenticatable implements MustVerifyEmail
             return 'ENDUSER';
         } else {
             return 'Not Have Role';
+        }
+    }
+    
+    public function getRoleSectionForNavAttribute()
+    {
+        if ($this->role == '0') {
+            return 'ADMIN';
+        } else if ($this->role == '1') {
+            return 'PENGELOLA';
+        } else if ($this->role == '2') {
+            return 'USER';
+        } else if ($this->role == '3') {
+            return 'ENDUSER';
+        } else {
+            return 'Not Have Role';
+        }
+    }
+
+    public function scopeSearch($query, $term, $email = false)
+    {
+        if ($email) {
+            return $query->where('name', 'like', "%$term%")
+                ->orWhere('email', 'like', "%$term%")
+                ->orWhere('nrp', 'like', "%$term%");
+        } else {
+            return $query->where('name', 'like', "%$term%")
+                ->orWhere('nrp', 'like', "%$term%");
         }
     }
 }

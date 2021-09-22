@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
@@ -50,7 +51,6 @@ class UserController extends Controller
             'name' => 'required|min:3|max:50|string',
             'avatar' => 'mimes:png,jpg,jpeg,ico,svg|max:2048',
             'email' => 'required|string',
-            'nrp' => 'required'
         ], $this->messages());
 
         $user = auth()->user();
@@ -73,13 +73,28 @@ class UserController extends Controller
             'name' => request('name'),
             'avatar' => $thumbnail,
             'email' => request('email'),
-            'nrp' => request('nrp')
         ]);
         return back();
     }
     public function pinjaman()
     {
         return view('user.pinjaman.index');
+    }
+    
+    public function darkmode(Request $request)
+    {
+        $class_name = $request->class_name;
+        $user = User::find(Auth::user()->id);
+
+        if ($class_name == "fa fa-lightbulb-o") {
+            $user->update([
+                'darkmode' => true
+            ]);
+        } else {
+            $user->update([
+                'darkmode' => false
+            ]);
+        }
     }
 }
 

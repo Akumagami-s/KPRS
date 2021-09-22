@@ -2,7 +2,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-12 footer-copyright text-center">
-                <small class="mb-0">Copyright 2020 © KPR<u class="text-secondary"></u></small>
+                <small class="mb-0">Copyright 2021 © DITKUAD<u class="text-secondary"></u></small>
             </div>
         </div>
     </div>

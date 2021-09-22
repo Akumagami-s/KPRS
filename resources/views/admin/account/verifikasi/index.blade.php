@@ -1,77 +1,115 @@
 @extends('layouts.app', ['title' => 'KPR | Verif User Account'])
+@section('dashboard', 'KELOLA ACCOUNT')
 @section('content')
-<div class="row">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-header">
-                <h5>Verifikasi Akun User</h5>
-                <form action="" method="post">
-                    <div class="d-flex justify-content-end">
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="input-group">
-                                    <input class="form-control" id="validationTooltip02" type="text" placeholder="Search" required="">
-                                    <div class="valid-tooltip">Looks good!</div>
-                                    <button class="btn btn-secondary ml-2">Search</button>
-                                </div>
-                            </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Verifikasi Akun User
+                        <div class="float-right">
+                            <button class="btn btn-info" id="reload-data" title="Refresh Data"><i
+                                    class="fa fa-refresh"></i></button>
                         </div>
-                    </div>
-                </form>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Role</th>
-                                <th>Avatar</th>
-                                <th>Name</th>
-                                <th>E-Mail</th>
-                                <th>NRP</th>
-                                <th>Password</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        @forelse ($accounts as $account)
-                        <tbody>
-                            <tr>
-                                <th>{{ $loop->iteration + $accounts->firstItem() - 1 . '.' }}</th>
-                                <td>{!! $account->RoleSection !!}</td>
-                                <td>
-                                    @empty($account->avatar)
-                                    <img class="rounded-circle" src="{{ asset('assets/images/avatar/avatar-default.png') }}" width="60" alt="avatar">
-                                    @else
-                                    <img class="rounded-circle" src="{{ $account->ImgProfile }}" style="width: 60px; height: 60px; object-fit: cover; object-position: center;" alt="avatar">
-                                    @endempty
-                                </td>
-                                <td>{{ $account->name }}</td>
-                                <td>{{ $account->email }}</td>
-                                <td>{{ $account->nrp }}</td>
-                                <td><span class="badge badge-light">DILINDUNGI<span></td>
-                                <td>
-                                    <form action="{{ route('admin.account.verified', $account->id) }}" method="post">
-                                        @csrf
-                                        @method('PATCH')
-                                        <button type="submit" class="btn btn-success btn-sm"><i class="fa fa-check"></i> VERIFIED</button>
-                                    </form>
-                                </td>
-                            </tr>
-                        </tbody>
-                        @empty
-                        <tbody>
-                            <tr>
-                                <th colspan="8" style="color: red; text-align: center;">Data Empty!</th>
-                            </tr>
-                        </tbody>
-                        @endforelse
-                    </table>
+                    </h5>
                 </div>
-            </div>
-            <div class="card-footer">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover" width="100%">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Role</th>
+                                    <th>Avatar</th>
+                                    <th>Name</th>
+                                    <th>E-Mail</th>
+                                    <th>NRP</th>
+                                    <th>Password</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
 @endsection
+
+@push('style')
+    <link rel="stylesheet" href="{{ asset('assets/js/datatable/datatables.net-bs4/css/dataTables.bootstrap4.min.css') }}">
+    <style>
+        .dataTables_scroll {
+            overflow: auto;
+        }
+
+    </style>
+@endpush
+
+@push('datatable')
+    <script src="{{ asset('assets/js/datatable/datatables.net/js/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('assets/js/datatable/datatables.net-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
+    <script>
+        const dataUrl = '{{ route('admin.account.verifikasi') }}'
+
+        jQuery(function($) {
+            const table = $("table").DataTable({
+                responsive: true,
+                serverSide: true,
+                processing: true,
+                ajax: {
+                    url: dataUrl,
+                    type: "get",
+                    error: (response) => {
+                        console.log(response);
+                    },
+                },
+                searching: true,
+                columns: [{
+                        data: null,
+                        sortable: false,
+                        searchable: false,
+                        render: function(data, type, row, meta) {
+                            return meta.row + meta.settings._iDisplayStart + 1;
+                        },
+                    },
+                    {
+                        data: "role"
+                    },
+                    {
+                        data: "avatar",
+                        sortable: null,
+                        searchable: null
+                    },
+                    {
+                        data: "name"
+                    },
+                    {
+                        data: "email"
+                    },
+                    {
+                        data: "nrp"
+                    },
+                    {
+                        data: "password",
+                        sortable: null,
+                        searchable: null
+                    },
+                    {
+                        data: "action",
+                        sortable: false,
+                        searchable: false,
+                    },
+                ],
+            });
+
+            const reload = () => table.ajax.reload();
+
+            $('.dataTable').wrap('<div class="dataTables_scroll" />');
+
+            $("#reload-data").click(function() {
+                reload()
+            })
+        });
+    </script>
+@endpush

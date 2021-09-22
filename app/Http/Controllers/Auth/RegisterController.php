@@ -51,7 +51,7 @@ class RegisterController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'nrp' => ['required', 'min:2', 'max:100', 'unique:users,nrp'],
-            'password' => ['required', 'min:8', 'confirmed'],
+            'password' => ['required', 'min:8', 'confirmed', 'regex:/^.*(?=.{3,})(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\d\x])(?=.*[!$#%]).*$/'],
         ]);
     }
 
@@ -67,7 +67,7 @@ class RegisterController extends Controller
             'name' => $data['name'],
             'email' => $data['email'],
             'role' => "3",
-            'pangkat_id' => $data['pangkat_id'],
+            'pangkat' => $data['pangkat'],
             'nrp' => $data['nrp'],
             'password' => Hash::make($data['password']),
             'status_verif' => 0,

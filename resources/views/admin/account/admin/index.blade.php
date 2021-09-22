@@ -1,67 +1,76 @@
 @extends('layouts.app', ['title' => 'KPR | Kelola Account'])
 @section('content')
-<div class="row">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-header">
-                <div class="justify-content-between">
-                    <a href="{{ route('admin.account.admin') }}" class="btn btn-info"><i class="fa fa-refresh"></i></a>
-                    <form action="{{ route('admin.account.search.admin') }}" method="GET">
-                        <div class="d-flex justify-content-end">
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="input-group">
-                                        <input class="form-control" id="validationTooltip02" type="search" name="query" placeholder="Search" required="">
-                                        <div class="valid-tooltip">Looks good!</div>
-                                        <button class="btn btn-secondary ml-2">Search</button>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="justify-content-between">
+                        <a href="{{ route('admin.account.admin') }}" class="btn btn-info"><i
+                                class="fa fa-refresh"></i></a>
+                        <form action="{{ route('admin.account.search.admin') }}" method="GET">
+                            @csrf
+                            <div class="d-flex justify-content-end">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="input-group">
+                                            <input class="form-control" id="validationTooltip02" type="search"
+                                                name="query" placeholder="Search" required="">
+                                            <div class="valid-tooltip">Looks good!</div>
+                                            <button class="btn btn-secondary ml-2">Search</button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Avatar</th>
-                                <th>Name</th>
-                                <th>E-Mail</th>
-                                <th>NRP</th>
-                                <th>Password</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        @forelse ($accounts as $account)
-                        <tbody>
-                            <tr>
-                                <th>{{ $loop->iteration + $accounts->firstItem() - 1 . '.' }}</th>
-                                <td>
-                                    @empty($account->avatar)
-                                    <img class="rounded-circle" src="{{ asset('assets/images/avatar/avatar-default.png') }}" width="60" alt="avatar">
-                                    @else
-                                    <img class="rounded-circle" src="{{ $account->ImgProfile }}" style="width: 60px; height: 60px; object-fit: cover; object-position: center;" alt="avatar">
-                                    @endempty
-                                </td>
-                                <td>{{ $account->name }}</td>
-                                <td>{{ $account->email }}</td>
-                                <td>{{ $account->nrp }}</td>
-                                <td><span class="badge badge-light">DILINDUNGI<span></td>
-                                <td>
-                                    <a href="{{ route('admin.account.register.edit', $account->id) }}" style="float: left;" class="mr-1"><i class="fa fa-pencil-square-o" style="color: rgb(0, 241, 12);"></i></a>
-                                    @include('alert.deleteUser')
-                                </td>
-                            </tr>
-                        </tbody>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Avatar</th>
+                                    <th>Name</th>
+                                    <th>E-Mail</th>
+                                    <th>NRP</th>
+                                    <th>Password</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            @forelse ($accounts as $account)
+                                <tbody>
+                                    <tr>
+                                        <th>{{ $loop->iteration + $accounts->firstItem() - 1 . '.' }}</th>
+                                        <td>
+                                        @empty($account->avatar)
+                                            <img class="rounded-circle"
+                                                src="{{ asset('assets/images/avatar/avatar-default.png') }}" width="60"
+                                                alt="avatar">
+                                        @else
+                                            <img class="rounded-circle" src="{{ $account->ImgProfile }}"
+                                                style="width: 60px; height: 60px; object-fit: cover; object-position: center;"
+                                                alt="avatar">
+                                        @endempty
+                                    </td>
+                                    <td>{{ $account->name }}</td>
+                                    <td>{{ $account->email }}</td>
+                                    <td>{{ $account->nrp }}</td>
+                                    <td><span class="badge badge-light">DILINDUNGI<span></td>
+                                    <td>
+                                        <a href="{{ route('admin.account.register.edit', $account->id) }}"
+                                            style="float: left;" class="mr-1"><i class="fa fa-pencil-square-o"
+                                                style="color: rgb(0, 241, 12);"></i></a>
+                                        @include('alert.deleteUser')
+                                    </td>
+                                </tr>
+                            </tbody>
                         @empty
-                        <tbody>
-                            <tr>
-                                <th colspan="8" style="color: red; text-align: center;">Data Empty!</th>
-                            </tr>
-                        </tbody>
+                            <tbody>
+                                <tr>
+                                    <th colspan="8" style="color: red; text-align: center;">Data Empty!</th>
+                                </tr>
+                            </tbody>
                         @endforelse
                     </table>
                 </div>
@@ -73,12 +82,14 @@
     </div>
 </div>
 {{-- add data modal --}}
-<div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabel2">Add New Account</h5>
-                <button class="close" type="button" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">×</span></button>
             </div>
             <form action="{{ route('admin.account.register.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
@@ -93,13 +104,15 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="col-form-label" for="name">Name:</label>
-                                <input class="form-control" type="text" name="name" id="name" placeholder="your name" required>
+                                <input class="form-control" type="text" name="name" id="name" placeholder="your name"
+                                    required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="col-form-label" for="email">E-Mail:</label>
-                                <input class="form-control" type="email" name="email" id="email" placeholder="your email" required>
+                                <input class="form-control" type="email" name="email" id="email"
+                                    placeholder="your email" required>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -116,13 +129,15 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="col-form-label" for="username">Username:</label>
-                                <input class="form-control" type="text" name="username" id="username" placeholder="username" required>
+                                <input class="form-control" type="text" name="username" id="username"
+                                    placeholder="username" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label class="col-form-label" for="password">Password:</label>
-                                <input class="form-control" type="password" name="password" id="password" placeholder="********" required>
+                                <input class="form-control" type="password" name="password" id="password"
+                                    placeholder="********" required>
                             </div>
                         </div>
                     </div>
@@ -140,13 +155,15 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <label class="col-form-label" for="username">Username:</label>
-                        <input class="form-control" type="text" name="username" id="username" placeholder="username" required>
+                        <input class="form-control" type="text" name="username" id="username" placeholder="username"
+                            required>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         <label class="col-form-label" for="password">Password:</label>
-                        <input class="form-control" type="password" name="password" id="password" placeholder="********" required>
+                        <input class="form-control" type="password" name="password" id="password"
+                            placeholder="********" required>
                     </div>
                 </div>
         </div>

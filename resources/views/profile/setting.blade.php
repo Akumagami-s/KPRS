@@ -66,21 +66,7 @@
                                 @enderror
                             </div>
                         </div>
-                        <div class="row form-group">
-                            <div class="col col-md-3">
-                                <label for="nrp" class=" form-control-label">NRP</label>
-                            </div>
-                            <div class="col-12 col-md-9">
-                                <input type="text" id="nrp" name="nrp"
-                                    value="{{ auth()->user()->nrp ?? old('nrp') }}" placeholder="Admin2325"
-                                    class="form-control @error('nrp') is-invalid @enderror">
-                                @error('nrp')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
+                       
                     </div>
                     <div class="card-footer">
                         <a href="{{ route('home') }}" class="btn btn-secondary btn-sm mr-1">

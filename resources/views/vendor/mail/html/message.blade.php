@@ -2,7 +2,7 @@
 {{-- Header --}}
 @slot('header')
 @component('mail::header', ['url' => config('app.url')])
-{{ config('app.name') }}
+{{ 'KPR BTN TNI AD' }}
 @endcomponent
 @endslot
 

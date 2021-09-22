@@ -3,6 +3,7 @@
   <head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400&display=swap" rel="stylesheet">
 
@@ -17,6 +18,7 @@
     <link rel="stylesheet" href="{{asset('stylelogin/css/style.css')}}">
 
     <link rel="icon" href="{{asset('assets/images/logo-tni.png')}}">
+    
 
     <title>{{ "KPR | " . $title }}</title>
   </head>

@@ -1,17 +1,45 @@
 @extends('layouts.loglayout', ['title' => 'Register'])
 @section('content')
+<style>
+    @media (min-width: 320px) and (max-width: 480px) {
+      .logo-tni
+      {
+          max-width: 100% !important;  
+            height: auto !important;  
+          margin-top: 0px;
+          margin: 60px;
+      }
+      .logo-btn
+      {
+         max-width: 100% !important;  
+            height: auto !important;  
+          margin-top: 0px;
+          margin: 60px;
+      }
+    }
+    
+    @media (min-width: 700px) {
+      .logo-btn
+      {
+          margin-top: 50px;
+      }
+    }
+</style>
 <div class="content">
   <div class="container">
-    <div class="row">
-      <div class="col-md-6">
-        <img src="{{asset('assets/images/ditkuad.png')}}" alt="Image" class="img-fluid">
+    <div class="row mt-5">
+      <div class="col-3">
+        <img src="{{ asset('assets/images/fixlogo.png') }}" alt="logoweb" width="250px" class="img-fluid logo-tni">
+      </div>
+      <div class="col-3 mt-5">
+        <img src="{{ asset('assets/images/btnlogo.jpg') }}" alt="logoweb" width="200px" class="img-fluid logo-btn">
       </div>
       <div class="col-md-6 contents">
         <div class="row justify-content-center">
-          <div class="col-md-8">
+          <div class="col-md-8 col-sm-12">
             <div class="mb-4">
-            <h3>Register</h3>
-            <p class="mb-4">Isilah data dengan baik dan benar.</p>
+            <h1>Register</h1>
+            <h5 class="mb-4">Isilah data dengan baik dan benar.</h5>
           </div>
           <form method="POST" action="{{ route('register') }}" class="theme-form">
               @csrf
@@ -36,17 +64,21 @@
                     </div>
 
                     <div class="form-group">
-                      <select class="form-control" name="pangkat_id" id="pangkat_id" required>
-                        <option disabled selected>Pilih Pangkat</option>
-                        @foreach ($pangkats as $pangkat)
-                            <option value="{{ $pangkat->id }}">{{ $pangkat->pangkat }}</option>
+                      <select name="pangkat" id="pangkat" class="form-control custom-select text @error('pangkat') is-invalid @enderror"
+                        style="background-color: #edf2f5; font-size: 18px" required>
+                        <option value="" disabled selected>Pangkat</option>
+                        @foreach($pangkat as $value)
+                          <option value="{{ $value['pangkat'] }}" 
+                            {{ old('pangkat')== $value['pangkat'] ? 'selected' : '' }}>
+                            {{ $value['pangkat'] }}
+                          </option>
                         @endforeach
-                        @error('pangkat_id')
-                            <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
-                            </span>
-                        @enderror
                       </select>
+                      @error('pangkat')
+                          <span class="invalid-feedback" role="alert">
+                              <strong>{{ $message }}</strong>
+                          </span>
+                      @enderror
                     </div>
 
                     <div class="form-group">
@@ -64,7 +96,7 @@
                       <input class="form-control @error('password') is-invalid @enderror" type="password" name="password" id="password" autocomplete="new-password" required>
                         @error('password')
                             <span class="invalid-feedback" role="alert">
-                                <strong>{{ $message }}</strong>
+                                <strong>password harus terdiri dari huruf besar, huruf kecil, angka dan symbol.</strong>
                             </span>
                         @enderror
                     </div>

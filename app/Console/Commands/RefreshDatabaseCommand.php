@@ -3,6 +3,9 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
+use App\Detailkpr;
 
 class RefreshDatabaseCommand extends Command
 {
@@ -37,8 +40,30 @@ class RefreshDatabaseCommand extends Command
      */
     public function handle()
     {
-        $this->call('migrate:fresh');
-        $this->call('db:seed');
-        $this->info('migrate fresh & seeder success!');
+        Log::info("Menjalankan update tunggakan");
+
+        Detailkpr::select('id', 'nama', 'jml_angs', 'angs_ke', 'angsuran_masuk', 'tunggakan', 'jml_tunggakan')
+            ->each(function ($kpr) {
+                if ($kpr->angs_ke != $kpr->angsuran_masuk) {
+                    // $tunggakan = $kpr->tunggakan + 1;
+                    // $jml_tunggakan = $kpr->jml_angs * $tunggakan;
+                    // $angs_ke = $kpr->angs_ke + 1;
+
+                    // DB::beginTransaction();
+                    // try {
+                    //     $kpr->update([
+                    //         'angs_ke' => $angs_ke,
+                    //         'tunggakan' => $tunggakan,
+                    //         'jml_tunggakan' => $jml_tunggakan,
+                    //     ]);
+                    //     DB::commit();
+                    // } catch (\Exception $e) {
+                    //     Log::info($e->getMessage());
+                    //     DB::rollback();
+                    // }
+                }
+            });
+
+        Log::info("Update berhasil");
     }
 }

@@ -8,49 +8,37 @@
                     <h5>Pinjaman KPR</h5>
                     <hr>
                     <h4>Besar PInjaman</h4>
-                    <p>Rp.{{ $besar_pinjaman }}</p>
-                    <h4>Bunga</h4><p>Bunga {{ $bunga }}</p>
+                    <p>{{ "Rp. " . number_format($besar_pinjaman, 0,',','.') }}</p>
+                    
+                    <h4>Bunga</h4><p>Bunga {{ $bunga }}%</p>
                     <h4>Jangka Waktu</h4><p>Jangka Waktu(bulan) {{ $jangka }}</p>
                     <h4>NRP User</h4><p>NRP User {{ auth()->user()->nrp }}</p>
-                    <h4>Besar Angsuran <p>{{ $besar_angsuran }}</p></h4>
+                    <h4>Besar Angsuran <p>{{ "Rp. " . number_format($besar_angsuran, 0,',','.') }}</p></h4>
+                    
                     <h4>Anuitas <p>{{ $anuitas }}</p></h4>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table table-hover">
                             <tr>
-                                <th style="background-color:yellow;width:100px">no</th>
-                                @php
-                                for($i = 0; $i <= $no;$i++){ echo '<td>' . $i .'</td>';
-                                    }
-                                    @endphp
+                                <th class="text-center">Angsuran Ke</th>
+                                <th class="text-right">Angsuran Pokok</th>
+                                <th class="text-right">Angsuran Bunga</th>
+                                <th class="text-right">Sisa Pinjaman Pokok</th>
                             </tr>
+                            @php
+                                $no = 0;
+                            @endphp
+                            @foreach ($all['bunga'] as $index => $value)
                             <tr>
-                                <th style="background-color:yellow;width:100px">Angsuran Pokok</th>
-                                @foreach ($all['pokok'] as $data)
-                                <td>{{ $data }}</td>
-                                @endforeach
+                                <td align=center>{{ $no++ }}</td>
+                                <td align=right>{{number_format(round($all['pokok'][$index]))}}
+                                    </td>
+                                <td align=right>{{number_format(round($all['bunga'][$index]))}}</td>
+                                <td align=right>{{number_format(round($all['pinjaman'][$index]))}}</td>
+                                
                             </tr>
-                            <tr>
-                                <th style="background-color:yellow;width:100px">Angsuran Bunga</th>
-                                @foreach ($all['bunga'] as $data)
-                                <td>{{ $data }}</td>
-                                @endforeach
-                            </tr>
-                            <tr>
-                                <th style="background-color:yellow;width:100px">Besar Angsuran</th>
-                                @php
-                                echo '<td></td>';
-                                for($i = 0; $i < $no;$i++){ echo '<td>' . $besar_angsuran .'</td>';
-                                    }
-                                    @endphp
-                            </tr>
-                            <tr>
-                                <th style="background-color:yellow;width:100px">Sisa Pinjaman Pokok</th>
-                                @foreach ($all['pinjaman'] as $data)
-                                <td>{{ $data }}</td>
-                                @endforeach
-                            </tr>
+                            @endforeach
                         </table>
                     </div>
                 </div>

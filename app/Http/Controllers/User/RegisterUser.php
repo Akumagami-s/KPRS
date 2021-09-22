@@ -2,16 +2,17 @@
 
 namespace App\Http\Controllers\User;
 
+use App\Detailkpr;
 use App\Http\Controllers\Controller;
-use App\Pangkat;
 
 class RegisterUser extends Controller
 {
     public function index()
     {
-        return view('auth.register', [
-            'pangkats' => Pangkat::get()
-        ]);
+        $pangkats = Detailkpr::select('pangkat')->groupBy('pangkat')->get()->toArray();
+        $pangkat = array_values(array_filter($pangkats, 'array_filter'));
+        
+        return view('auth.register', compact('pangkat'));
     }
 
 }

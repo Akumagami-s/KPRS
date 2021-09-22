@@ -27,7 +27,15 @@
         <div class="nav-right col-8 pull-right right-header p-0">
             <ul class="nav-menus">
                 <li>
-                    <div class="mode"><i class="fa fa-moon-o"></i></div>
+                    <div class="mode">
+                        @if(Auth::check())
+                            @if(Auth::user()->darkmode == true)
+                                <i class="fa fa-lightbulb-o"></i>
+                            @else    
+                                <i class="fa fa-moon-o"></i>
+                            @endif
+                        @endif
+                    </div>
                 </li>
                 <li class="maximize"><a class="text-dark" href="#!" onclick="javascript:toggleFullScreen()"><i
                             data-feather="maximize"></i></a></li>
@@ -44,7 +52,7 @@
                             </div>
                         </div>
                         <div class="media-body"><span>{{ auth()->user()->name }}</span>
-                            <p class="mb-0 font-roboto">{!! Str::upper(auth()->user()->RoleSection) !!} <i class="middle fa fa-angle-down"></i></p>
+                            <p class="mb-0 font-roboto">{{  Str::upper(auth()->user()->RoleSectionForNav)  }} <i class="middle fa fa-angle-down"></i></p>
                         </div>
                     </div>
                     <ul class="profile-dropdown onhover-show-div">
@@ -93,3 +101,20 @@
 <form id="logout-form" action="{{ route('logout') }}" method="POST">
     @csrf
 </form>
+
+@push('script')
+    <script>
+        $(".mode").on("click", function () {
+            let csrf = '{{ csrf_token() }}'
+            let class_name = $('.mode i').attr('class')
+            $.ajax({
+                type: 'post',
+                url: '{{ route('darkmode') }}',
+                data: {
+                    _token: csrf,
+                    class_name: class_name,
+                },
+            })
+        })
+    </script>
+@endpush
