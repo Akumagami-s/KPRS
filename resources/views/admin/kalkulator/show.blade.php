@@ -18,7 +18,7 @@
                                 <th style="text-align: center;">Sisa Pinjaman Pokok</th>
                             </tr>
                             @php
-                                $no = 0;
+                                $no = 1;
                             @endphp
                             @foreach ($all['bunga'] as $index => $value)
                             <tr>

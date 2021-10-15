@@ -1,467 +1,1079 @@
-@extends('layouts.app', ['title' => 'KPR | Home'])
-@section('content')
-    <div class="container-fluid">
-        @if (auth()->user()->role == '3' && auth()->user()->email_verified_at == null)
-            <div class="card p-3">
-                <h1>Silahkan cek email untuk verifikasi.</h1>
-                <form class="d-inline" method="POST" action="{{ route('verification.resend') }}">
-                    @csrf
-                    <button type="submit" class="btn btn-link p-0 m-0 align-baseline">
-                        <p> Tidak Menerima Email? Cek spam atau kirim ulang.</p>
-                    </button>
-                </form>
-            </div>
-        @endif
-        @if (auth()->user()->role == '3' && auth()->user()->email_verified_at != null)
-            <div class="card p-3">
-                <h1 class="badge badge-warning">Akun anda sedang dalam proses verifikasi</h1>
-            </div>
-        @endif
-        @if (auth()->user()->role == '2' || auth()->user()->email_verified_at != null)
-            <div class="card">
-                <div class="card-header">
-                    <h3>Langkah Verifikasi Akun</h3>
-                </div>
-                <div class="card-body">
-                    <form class="f1" method="post">
-                        @csrf
-                        <div class="f1-steps">
-                            <div class="f1-progress">
-                                <div class="f1-progress-line" data-now-value="16.66" data-number-of-steps="3"></div>
-                            </div>
-                            @if (auth()->user()->role == '3' || (auth()->user()->email_verified_at != null && auth()->user()->role == '2'))
-                                <div class="f1-step active">
-                                    <div class="f1-step-icon"><i class="fa fa-key"></i></div>
-                                    <p>Email</p>
-                                </div>
-                            @else
-                                <div class="f1-step">
-                                    <div class="f1-step-icon"><i class="fa fa-key"></i></div>
-                                    <p>Email</p>
-                                </div>
-                            @endif
-                            @if (auth()->user()->role == '2' && auth()->user()->status_verif == 1)
-                                <div class="f1-step active">
-                                    <div class="f1-step-icon"><i class="fa fa-user"></i></div>
-                                    <p>Approval Pengelola</p>
-                                </div>
-                            @else
-                                <div class="f1-step">
-                                    <div class="f1-step-icon"><i class="fa fa-user"></i></div>
-                                    <p>Approval Pengelola</p>
-                                </div>
-                            @endif
-                            @if (auth()->user()->role == '2')
-                                <div class="f1-step active">
-                                    <div class="f1-step-icon"><i class="fa fa-money"></i></div>
-                                    <p>Pinjaman</p>
-                                </div>
-                            @else
-                                <div class="f1-step">
-                                    <div class="f1-step-icon"><i class="fa fa-money"></i></div>
-                                    <p>Pinjaman</p>
-                                </div>
-                            @endif
-                        </div>
-                        <fieldset>
-                            <div class="form-group mb-2">
-                                <label for="f1-first-name">First Name</label>
-                                <input class="form-control" id="f1-first-name" type="text" name="f1-first-name"
-                                    placeholder="name@example.com" required="">
-                            </div>
-                            <div class="form-group mb-2">
-                                <label for="f1-last-name">Last name</label>
-                                <input class="f1-last-name form-control" id="f1-last-name" type="text" name="f1-last-name"
-                                    placeholder="Last name..." required="">
-                            </div>
-                            <div class="f1-buttons">
-                                <button class="btn btn-primary btn-next" type="button">Next</button>
-                            </div>
-                        </fieldset>
-                        <fieldset>
-                            <div class="form-group mb-2">
-                                <label class="sr-only" for="f1-email">Email</label>
-                                <input class="f1-email form-control" id="f1-email" type="text" name="f1-email"
-                                    placeholder="Email..." required="">
-                            </div>
-                            <div class="form-group mb-2">
-                                <label class="sr-only" for="f1-password">Password</label>
-                                <input class="f1-password form-control" id="f1-password" type="password" name="f1-password"
-                                    placeholder="Password..." required="">
-                            </div>
-                            <div class="form-group mb-2">
-                                <label class="sr-only" for="f1-repeat-password">Repeat password</label>
-                                <input class="f1-repeat-password form-control" id="f1-repeat-password" type="password"
-                                    name="f1-repeat-password" placeholder="Repeat password..." required="">
-                            </div>
-                            <div class="f1-buttons">
-                                <button class="btn btn-primary btn-previous" type="button">Previous</button>
-                                <button class="btn btn-primary btn-next" type="button">Next</button>
-                            </div>
-                        </fieldset>
-                        <fieldset>
-                            <div class="form-group mb-2">
-                                <label class="sr-only">DD</label>
-                                <input class="form-control" id="dd" type="number" placeholder="dd" required="">
-                            </div>
-                            <div class="form-group mb-2">
-                                <label class="sr-only">MM</label>
-                                <input class="form-control" id="mm" type="number" placeholder="mm" required="">
-                            </div>
-                            <div class="form-group mb-2">
-                                <label class="sr-only">YYYY</label>
-                                <input class="form-control" id="yyyy" type="number" placeholder="yyyy" required="">
-                            </div>
-                            <div class="f1-buttons">
-                                <button class="btn btn-primary btn-previous" type="button">Previous</button>
-                                <button class="btn btn-primary btn-submit" type="submit">Submit</button>
-                            </div>
-                        </fieldset>
-                    </form>
-                </div>
-            </div>
-        @endif
-        @if (auth()->user()->role == '0' || auth()->user()->role == '1')
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="card shadow">
+@extends('layouts.base')
 
-                        <div class="card-header">
-                            <h3>Rekap Data MassDebet BRI & Manual</h3>
+@section('content')
+
+
+    <div class="mainContent">
+        <div class="container-fluid">
+            <div class="wrapperContent">
+                <h1 class="titleHeaderContent">Dashboard eKPR</h1>
+
+                <div class="wrapperRekapData">
+                    <div class="wrapperContentRekapData">
+                        <div class="wrapperRekapDataPerbulan">
+                            <h1 class="headerData">Rekap Data Perbulan</h1>
+
+                            <div class="contentData">
+                                <div class="wrapperChart">
+                                    <canvas id="chartRekapData"></canvas>
+                                </div>
+
+                                <div class="wrapperInfoChart">
+                                    <div class="label totalPokok">
+                                        <h1 class="nameLabel">Total Pokok (IDR)</h1>
+                                        <p class="value">Rp.{{ number_format($piutang_pokok, 0, ',', '.') }}</p>
+                                    </div>
+                                    <div class="label totalBunga">
+                                        <h1 class="nameLabel">Total Bunga (IDR)</h1>
+                                        <p class="value">Rp.{{ number_format($piutang_bunga, 0, ',', '.') }}</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="card-body">
-                            <div class="row mb-5">
-                                <div class="col-md-4">
-                                    <div class="card shadow"
-                                        style="width: 100%; border: 1px solid rgba(15, 7, 7, 0.082); height: 14rem; border-radius: 0;">
-                                        <center>
-                                            <div class="card-body">
-                                                <h5 class="card-title"><i class="fa fa-money"
-                                                        style="color: green;"></i></h5>
-                                                <p class="card-text">
-                                                <h5>Rp.{{ number_format($totaltunggakan, 0, ',', '.') }}</h5>
-                                                </p>
-                                                <span>Total Tunggakan (IDR)</span>
-                                            </div>
-                                        </center>
+                        <div class="containerDebitur">
+                            <div class="wrapperDebitur">
+                                <div class="debitur debiturBaru">
+                                    <div class="contentDebitur">
+                                        <h3 class="labelName">Debitur Baru</h3>
+                                        <h1 class="value">{{ $debiturbaru }}</h1>
+                                        {{-- <p class="month">Agustus 2021</p> --}}
+                                    </div>
+                                    <div class="wrapperChart">
+                                        <canvas id="chartDebiturBaru"></canvas>
+                                        <div class="wrapperArrow">
+                                            <img src="../assets/img/arrowChart.svg" alt="">
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
-                                    <div class="card shadow"
-                                        style="width: 100%; border: 1px solid rgba(15, 7, 7, 0.082); height: 14rem; border-radius: 0;">
-                                        <center>
-                                            <div class="card-body">
-                                                <h5 class="card-title"><i class="fa fa-users"
-                                                        style="color: salmon;"></i></h5>
-                                                <p class="card-text">
-                                                <h5>{{ $user }}</h5>
-                                                </p>
-                                                <span>Total Debitur</span>
-                                            </div>
-                                        </center>
+                                <div class="debitur debiturLunas">
+                                    <div class="contentDebitur">
+                                        <h3 class="labelName">Debitur Lunas</h3>
+                                        <h1 class="value">{{ $debiturlunas }}</h1>
+                                        {{-- <p class="month">Agustus 2021</p> --}}
+                                    </div>
+                                    <div class="wrapperChart">
+                                        <canvas id="chartDebiturLunas"></canvas>
+                                        <div class="wrapperArrow">
+                                            <img src="../assets/img/arrowChart.svg" alt="">
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
-                                    <div class="card shadow"
-                                        style="width: 100%; border: 1px solid rgba(15, 7, 7, 0.082); height: 14rem; border-radius: 0;">
-                                        <center>
-                                            <div class="card-body">
-                                                <h5 class="card-title"><i class="fas fa-exchange-alt"
-                                                        style="color: gray;"></i></h5>
-                                                <p class="card-text">
-                                                <h5>Rp.{{ number_format($jumlahpinjaman, 0, ',', '.') }}</h5>
-                                                </p>
-                                                <span>Total Pinjaman (IDR)</span>
-                                            </div>
-                                        </center>
-                                    </div>
-                                </div>
+
                             </div>
-                            <div class="row mb-4">
-                                <div class="col-md-6">
-                                    <h4>Penerimaan</h4>
-                                </div>
-                            </div>
-                            <div class="row mb-5">
-                                <div class="col-md-6">
-                                    <div class="card shadow"
-                                        style="width: 100%; border: 1px solid rgba(15, 7, 7, 0.082); height: 14rem; border-radius: 0;">
-                                        <center>
-                                            <div class="card-body">
-                                                <h5 class="card-title"><i class="fa fa-money-check-alt"
-                                                        style="color: #184d47;"></i></h5>
-                                                <p class="card-text">
-                                                <h5>Rp.{{ number_format($total_pokok, 0, ',', '.') }}</h5>
-                                                </p>
-                                                <span>Total Pokok (IDR)</span>
-                                            </div>
-                                        </center>
+                            <div class="wrapperDebitur">
+                                <div class="debitur debiturMeninggal">
+                                    <div class="contentDebitur">
+                                        <h3 class="labelName">Debitur Meninggal</h3>
+                                        <h1 class="value">agussssssss</h1>
+                                        {{-- <p class="month">Agustus 2021</p> --}}
+                                    </div>
+                                    <div class="wrapperChart">
+                                        <canvas id="chartDebiturMeninggal"></canvas>
+                                        <div class="wrapperArrow">
+                                            <img src="../assets/img/arrowChart.svg" alt="">
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <div class="card shadow"
-                                        style="width: 100%; border: 1px solid rgba(15, 7, 7, 0.082); height: 14rem; border-radius: 0;">
-                                        <center>
-                                            <div class="card-body">
-                                                <h5 class="card-title"><i class="fa fa-money-check-alt"
-                                                        style="color: #e48900;"></i></h5>
-                                                <p class="card-text">
-                                                <h5>Rp.{{ number_format($total_bunga, 0, ',', '.') }}</h5>
-                                                </p>
-                                                <span>Total Bunga (IDR)</span>
-                                            </div>
-                                        </center>
+                                <div class="debitur debiturOutstanding">
+                                    <div class="contentDebitur">
+                                        <h3 class="labelName">Data Outstanding</h3>
+                                        <h1 class="value">{{ $rekapoutstanding ?? '' }}</h1>
+                                        {{-- <p class="month">Agustus 2021</p> --}}
+                                    </div>
+                                    <div class="wrapperChart">
+                                        <canvas id="chartDebiturOutstanding"></canvas>
+                                        <div class="wrapperArrow">
+                                            <img src="../assets/img/arrowChart.svg" alt="">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="row mb-4">
-                                <div class="col-md-5">
-                                    <h4>Total Piutang</h4>
-                                </div>
-                            </div>
-                            <div class="row mb-6">
-                                <div class="col-md-6">
-                                    <div class="card shadow"
-                                        style="width: 100%; border: 1px solid rgba(15, 7, 7, 0.082); height: 14rem; border-radius: 0;">
-                                        <center>
-                                            <div class="card-body">
-                                                <h5 class="card-title"><i class="fa fa-money-check-alt"
-                                                        style="color: #184d47;"></i></h5>
-                                                <p class="card-text">
-                                                <h5>Rp.{{ number_format($piutang_pokok, 0, ',', '.') }}</h5>
-                                                </p>
-                                                <span>Total Pokok (IDR)</span>
-                                            </div>
-                                        </center>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="card shadow"
-                                        style="width: 100%; border: 1px solid rgba(15, 7, 7, 0.082); height: 14rem; border-radius: 0;">
-                                        <center>
-                                            <div class="card-body">
-                                                <h5 class="card-title"><i class="fa fa-money-check-alt"
-                                                        style="color: #e48900;"></i></h5>
-                                                <p class="card-text">
-                                                <h5>Rp.{{ number_format($piutang_bunga, 0, ',', '.') }}</h5>
-                                                </p>
-                                                <span>Total Bunga (IDR)</span>
-                                            </div>
-                                        </center>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="card-header">
-                                <h5>Detail Data</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table table-borderless">
-                                        <tr>
-                                            <th class="text-left">Jangka Waktu</th>
-                                            <th class="text-center">Saldo Pokok</th>
-                                            <th class="text-center">Saldo Bunga</th>
-                                            <th class="text-center">Piutang Pokok</th>
-                                            <th class="text-center">Piutang Bunga</th>
-                                        </tr>
-                                        @foreach ($detail_kpr as $det)
-                                            <tr>
-                                                <td>
-                                                    <span class="badge badge-secondary">{{ $det->jk_waktu }}</span>
-                                                </td>
-                                                <td class="text-right">
-                                                    {{ 'Rp.' . number_format($det->pokok, 0, ',', '.') }}</td>
-                                                <td class="text-right">
-                                                    {{ 'Rp.' . number_format($det->bunga, 0, ',', '.') }}</td>
-                                                <td class="text-right">
-                                                    {{ 'Rp.' . number_format($det->piutang_pokok, 0, ',', '.') }}</td>
-                                                <td class="text-right">
-                                                    {{ 'Rp.' . number_format($det->piutang_bunga, 0, ',', '.') }}</td>
-                                            </tr>
-                                        @endforeach
-                                    </table>
-                                </div>
-                            </div>
-                            <!--div class="row">
-                            <div class="col-md-12">
-                                <canvas id="myBarGraph"></canvas>
-                            </div>
-                        </div-->
                         </div>
                     </div>
                 </div>
-                <hr>
-                <div class="col-md-12">
-                    <div class="card shadow">
-                        <div class="card-header">
-                            <h3>Rekap Data Mass Debet BTN</h3>
+
+                <div class="wrapperRekapData rekapMassDebetBRI">
+                    <h1 class="titleRekapDataMassdebet">Rekap Data MassDebet BRI & Manual</h1>
+                    <div class="wrapperDataMassDebet">
+                        <div class="statistic">
+                            <div class="wrapperChart wrapperIcon">
+                                <canvas id="chartMassDebetBRITunggakan"></canvas>
+                                <div class="wrapperArrow">
+                                    <img src="../assets/img/arrowChart.svg" alt="">
+                                </div>
+                            </div>
+                            <div class="label">
+                                <h1 class="nameLabel">Total Tunggakan (IDR)</h1>
+                                <p class="value">Rp.{{ number_format($totaltunggakan, 0, ',', '.') }}</p>
+                            </div>
                         </div>
-                        <div class="card-body">
-                            <div class="row mb-5">
-                                <div class="col-md-4">
-                                    <div class="card shadow"
-                                        style="width: 100%; border: 1px solid rgba(15, 7, 7, 0.082); height: 14rem; border-radius: 0;">
-                                        <center>
-                                            <div class="card-body">
-                                                <h5 class="card-title"><i class="fa fa-money"
-                                                        style="color: green;"></i></h5>
-                                                <p class="card-text">
-                                                <h5>Rp.{{ number_format($totaltunggakan_btn, 0, ',', '.') }}</h5>
-                                                </p>
-                                                <span>Total Tunggakan (IDR)</span>
-                                            </div>
-                                        </center>
-                                    </div>
+
+                        <div class="statistic">
+                            <div class="wrapperChart wrapperIcon">
+                                <img src="../assets/img/debiturLogo.svg" alt="">
+                            </div>
+                            <div class="label">
+                                <h1 class="nameLabel">Total Debitur</h1>
+                                <p class="value">{{ $user }}</p>
+                            </div>
+                        </div>
+
+                        <div class="statistic">
+                            <div class="wrapperChart wrapperIcon">
+                                <canvas id="chartMassDebetBRIPinjaman"></canvas>
+                                <div class="wrapperArrow">
+                                    <img src="../assets/img/arrowChart.svg" alt="">
                                 </div>
-                                <div class="col-md-4">
-                                    <div class="card shadow"
-                                        style="width: 100%; border: 1px solid rgba(15, 7, 7, 0.082); height: 14rem; border-radius: 0;">
-                                        <center>
-                                            <div class="card-body">
-                                                <h5 class="card-title"><i class="fa fa-users"
-                                                        style="color: salmon;"></i></h5>
-                                                <p class="card-text">
-                                                <h4>{{ $user_btn }}</h4>
-                                                </p>
-                                                <span>Total Debitur</span>
-                                            </div>
-                                        </center>
-                                    </div>
+                            </div>
+                            <div class="label">
+                                <h1 class="nameLabel">Total Pinjaman (IDR)</h1>
+                                <p class="value">Rp.{{ number_format($jumlahpinjaman, 0, ',', '.') }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="wrapperRekapPenerimaan">
+                        <h1 class="nameContentSection">Rekap Penerimaan</h1>
+
+                        <div class="wrapperStatistic">
+                            <div class="statisticPenerimaan">
+                                <div class="label">
+                                    <h1 class="nameLabel">Total Pokok (IDR)</h1>
+                                    <p class="value"><span
+                                            class="mataUang">Rp.</span>{{ number_format($total_pokok, 0, ',', '.') }}
+                                    </p>
                                 </div>
-                                <div class="col-md-4">
-                                    <div class="card shadow"
-                                        style="width: 100%; border: 1px solid rgba(15, 7, 7, 0.082); height: 14rem; border-radius: 0;">
-                                        <center>
-                                            <div class="card-body">
-                                                <h5 class="card-title"><i class="fas fa-exchange-alt"
-                                                        style="color: gray;"></i></h5>
-                                                <p class="card-text">
-                                                <h5>Rp.{{ number_format($jumlahpinjaman_btn, 0, ',', '.') }}</h5>
-                                                </p>
-                                                <span>Total Pinjaman (IDR)</span>
-                                            </div>
-                                        </center>
+                                <div class="wrapperChart wrapperIcon">
+                                    <canvas id="chartPenerimaanTotalPokokBRI"></canvas>
+                                    <div class="wrapperArrow">
+                                        <img src="../assets/img/arrowChart.svg" alt="">
                                     </div>
                                 </div>
                             </div>
-                            <div class="row mb-4">
-                                <div class="col-md-6">
-                                    <h4>Penerimaan</h4>
+
+                            <div class="statisticPenerimaan">
+                                <div class="label">
+                                    <h1 class="nameLabel">Total Bunga (IDR)</h1>
+                                    <p class="value"><span
+                                            class="mataUang">Rp.</span>{{ number_format($total_bunga, 0, ',', '.') }}
+                                    </p>
                                 </div>
-                            </div>
-                            <div class="row mb-5">
-                                <div class="col-md-6">
-                                    <div class="card shadow"
-                                        style="width: 100%; border: 1px solid rgba(15, 7, 7, 0.082); height: 14rem; border-radius: 0;">
-                                        <center>
-                                            <div class="card-body">
-                                                <h5 class="card-title"><i class="fa fa-money-check-alt"
-                                                        style="color: #184d47;"></i></h5>
-                                                <p class="card-text">
-                                                <h5>Rp.{{ number_format($total_pokok_btn, 0, ',', '.') }}</h5>
-                                                </p>
-                                                <span>Total Pokok (IDR)</span>
-                                            </div>
-                                        </center>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="card shadow"
-                                        style="width: 100%; border: 1px solid rgba(15, 7, 7, 0.082); height: 14rem; border-radius: 0;">
-                                        <center>
-                                            <div class="card-body">
-                                                <h5 class="card-title"><i class="fa fa-money-check-alt"
-                                                        style="color: #e48900;"></i></h5>
-                                                <p class="card-text">
-                                                <h5>Rp.{{ number_format($total_bunga_btn, 0, ',', '.') }}</h5>
-                                                </p>
-                                                <span>Total Bunga (IDR)</span>
-                                            </div>
-                                        </center>
+                                <div class="wrapperChart wrapperIcon">
+                                    <canvas id="chartPenerimaanTotalBungaBRI"></canvas>
+                                    <div class="wrapperArrow">
+                                        <img src="../assets/img/arrowChart.svg" alt="">
                                     </div>
                                 </div>
                             </div>
-                            <div class="row mb-4">
-                                <div class="col-md-5">
-                                    <h4>Total Piutang</h4>
+                        </div>
+                    </div>
+
+                    <div class="wrapperRekapPiutang">
+                        <h1 class="nameContentSection">Rekap Piutang</h1>
+
+                        <div class="wrapperStatistic">
+                            <div class="statisticPiutang">
+                                <div class="label">
+                                    <h1 class="nameLabel">Total Pokok (IDR)</h1>
+                                    <p class="value"><span
+                                            class="mataUang">Rp.</span>{{ number_format($piutang_pokok, 0, ',', '.') }}
+                                    </p>
                                 </div>
-                            </div>
-                            <div class="row mb-6">
-                                <div class="col-md-6">
-                                    <div class="card shadow"
-                                        style="width: 100%; border: 1px solid rgba(15, 7, 7, 0.082); height: 14rem; border-radius: 0;">
-                                        <center>
-                                            <div class="card-body">
-                                                <h5 class="card-title"><i class="fa fa-money-check-alt"
-                                                        style="color: #184d47;"></i></h5>
-                                                <p class="card-text">
-                                                <h5>Rp.{{ number_format($piutang_pokok_btn, 0, ',', '.') }}</h5>
-                                                </p>
-                                                <span>Total Pokok (IDR)</span>
-                                            </div>
-                                        </center>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="card shadow"
-                                        style="width: 100%; border: 1px solid rgba(15, 7, 7, 0.082); height: 14rem; border-radius: 0;">
-                                        <center>
-                                            <div class="card-body">
-                                                <h5 class="card-title"><i class="fa fa-money-check-alt"
-                                                        style="color: #e48900;"></i></h5>
-                                                <p class="card-text">
-                                                <h5>Rp.{{ number_format($piutang_bunga_btn, 0, ',', '.') }}</h5>
-                                                </p>
-                                                <span>Total Bunga (IDR)</span>
-                                            </div>
-                                        </center>
+                                <div class="wrapperChart wrapperIcon">
+                                    <canvas id="chartPiutangTotalPokokBRI"></canvas>
+                                    <div class="wrapperArrow">
+                                        <img src="../assets/img/arrowChart.svg" alt="">
                                     </div>
                                 </div>
                             </div>
-                            <div class="card-header">
-                                <h5>Detail Data</h5>
+
+                            <div class="statisticPiutang">
+                                <div class="label">
+                                    <h1 class="nameLabel">Total Bunga (IDR)</h1>
+                                    <p class="value"><span
+                                            class="mataUang">Rp.</span>{{ number_format($piutang_bunga, 0, ',', '.') }}
+                                    </p>
+                                </div>
+                                <div class="wrapperChart wrapperIcon">
+                                    <canvas id="chartPiutangTotalBungaBRI"></canvas>
+                                    <div class="wrapperArrow">
+                                        <img src="../assets/img/arrowChart.svg" alt="">
+                                    </div>
+                                </div>
                             </div>
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table table-borderless">
+                        </div>
+                    </div>
+
+                    <div class="wrapperDetailData">
+                        <h1 class="nameContentSection">Detail Data</h1>
+                        <div class="wrapperTable">
+                            <table id="detailDataBRI" class="display table" style="width:100%">
+                                <thead class="headTable">
+                                    <tr>
+                                        <th>Jangka Waktu</th>
+                                        <th>Saldo Pokok</th>
+                                        <th>Saldo Bunga</th>
+                                        <th>Piutang Pokok</th>
+                                        <th>Piutang Bunga</th>
+                                    </tr>
+                                </thead>
+                                @foreach ($detail_kpr as $det)
+                                    <tbody class="bodyTable">
                                         <tr>
-                                            <th class="text-left">Jangka Waktu</th>
-                                            <th class="text-center">Saldo Pokok</th>
-                                            <th class="text-center">Saldo Bunga</th>
-                                            <th class="text-center">Piutang Pokok</th>
-                                            <th class="text-center">Piutang Bunga</th>
+                                            <td>{{ $det->jk_waktu }}</td>
+                                            <td> {{ 'Rp.' . number_format($det->pokok, 0, ',', '.') }}</td>
+                                            <td> {{ 'Rp.' . number_format($det->bunga, 0, ',', '.') }}</td>
+                                            <td>{{ 'Rp.' . number_format($det->piutang_pokok, 0, ',', '.') }}</td>
+                                            <td>{{ 'Rp.' . number_format($det->piutang_bunga, 0, ',', '.') }}</td>
                                         </tr>
-                                        @foreach ($detail_btn as $det)
-                                            <tr>
-                                                <td>
-                                                    <span class="badge badge-secondary">{{ $det->jk_waktu }}</span>
-                                                </td>
-                                                <td class="text-right">
-                                                    {{ 'Rp.' . number_format($det->pokok, 0, ',', '.') }}</td>
-                                                <td class="text-right">
-                                                    {{ 'Rp.' . number_format($det->bunga, 0, ',', '.') }}</td>
-                                                <td class="text-right">
-                                                    {{ 'Rp.' . number_format($det->piutang_pokok, 0, ',', '.') }}</td>
-                                                <td class="text-right">
-                                                    {{ 'Rp.' . number_format($det->piutang_bunga, 0, ',', '.') }}</td>
-                                            </tr>
-                                        @endforeach
-                                    </table>
-                                </div>
-                            </div>
-                            <!--div class="row">
-                            <div class="col-md-12">
-                                <canvas id="myBarGraph"></canvas>
-                            </div>
-                        </div-->
+                                    </tbody>
+                                @endforeach
+                            </table>
                         </div>
                     </div>
                 </div>
+
+                <div class="wrapperRekapData rekapMassDebetBTN">
+                    <h1 class="titleRekapDataMassdebet">Rekap Data MassDebet BTN</h1>
+                    <div class="wrapperDataMassDebet">
+                        <div class="statistic">
+                            <div class="wrapperChart wrapperIcon">
+                                <canvas id="chartMassDebetBTNTunggakan"></canvas>
+                                <div class="wrapperArrow">
+                                    <img src="../assets/img/arrowChart.svg" alt="">
+                                </div>
+                            </div>
+                            <div class="label">
+                                <h1 class="nameLabel">Total Tunggakan (IDR)</h1>
+                                <p class="value">Rp.{{ number_format($totaltunggakan_btn, 0, ',', '.') }}</p>
+                            </div>
+                        </div>
+
+                        <div class="statistic">
+                            <div class="wrapperChart wrapperIcon">
+                                <img src="../assets/img/debiturLogo.svg" alt="">
+                                <div class="wrapperArrow">
+                                    <img src="../assets/img/arrowChart.svg" alt="">
+                                </div>
+                            </div>
+                            <div class="label">
+                                <h1 class="nameLabel">Total Debitur</h1>
+                                <p class="value">{{ $user_btn }}</p>
+                            </div>
+                        </div>
+
+                        <div class="statistic">
+                            <div class="wrapperChart wrapperIcon">
+                                <canvas id="chartMassDebetBTNPinjaman"></canvas>
+                                <div class="wrapperArrow">
+                                    <img src="../assets/img/arrowChart.svg" alt="">
+                                </div>
+                            </div>
+                            <div class="label">
+                                <h1 class="nameLabel">Total Pinjaman (IDR)</h1>
+                                <p class="value">Rp.{{ number_format($jumlahpinjaman_btn, 0, ',', '.') }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="wrapperRekapPenerimaan">
+                        <h1 class="nameContentSection">Rekap Penerimaan</h1>
+
+                        <div class="wrapperStatistic">
+                            <div class="statisticPenerimaan">
+                                <div class="label">
+                                    <h1 class="nameLabel">Total Pokok (IDR)</h1>
+                                    <p class="value"><span
+                                            class="mataUang">Rp.</span>{{ number_format($total_pokok_btn, 0, ',', '.') }}
+                                    </p>
+                                </div>
+                                <div class="wrapperChart wrapperIcon">
+                                    <canvas id="chartPenerimaanTotalPokokBTN"></canvas>
+                                    <div class="wrapperArrow">
+                                        <img src="../assets/img/arrowChart.svg" alt="">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="statisticPenerimaan">
+                                <div class="label">
+                                    <h1 class="nameLabel">Total Bunga (IDR)</h1>
+                                    <p class="value"><span
+                                            class="mataUang">Rp.</span>{{ number_format($total_bunga_btn, 0, ',', '.') }}
+                                    </p>
+                                </div>
+                                <div class="wrapperChart wrapperIcon">
+                                    <canvas id="chartPenerimaanTotalBungaBTN"></canvas>
+                                    <div class="wrapperArrow">
+                                        <img src="../assets/img/arrowChart.svg" alt="">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="wrapperRekapPiutang">
+                        <h1 class="nameContentSection">Rekap Piutang</h1>
+
+                        <div class="wrapperStatistic">
+                            <div class="statisticPiutang">
+                                <div class="label">
+                                    <h1 class="nameLabel">Total Pokok (IDR)</h1>
+                                    <p class="value"><span
+                                            class="mataUang">Rp.</span>{{ number_format($piutang_pokok_btn, 0, ',', '.') }}
+                                    </p>
+                                </div>
+                                <div class="wrapperChart wrapperIcon">
+                                    <canvas id="chartPiutangTotalPokokBTN"></canvas>
+                                    <div class="wrapperArrow">
+                                        <img src="../assets/img/arrowChart.svg" alt="">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="statisticPiutang">
+                                <div class="label">
+                                    <h1 class="nameLabel">Total Bunga (IDR)</h1>
+                                    <p class="value"><span
+                                            class="mataUang">Rp.</span>{{ number_format($piutang_bunga_btn, 0, ',', '.') }}
+                                    </p>
+                                </div>
+                                <div class="wrapperChart wrapperIcon">
+                                    <canvas id="chartPiutangTotalBungaBTN"></canvas>
+                                    <div class="wrapperArrow">
+                                        <img src="../assets/img/arrowChart.svg" alt="">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="wrapperDetailData">
+                        <h1 class="nameContentSection">Detail Data</h1>
+                        <div class="wrapperTable">
+                            <table id="detailDataBTN" class="display table" style="width:100%">
+                                <thead class="headTable">
+                                    <tr>
+                                        <th>Jangka Waktu</th>
+                                        <th>Saldo Pokok</th>
+                                        <th>Saldo Bunga</th>
+                                        <th>Piutang Pokok</th>
+                                        <th>Piutang Bunga</th>
+                                    </tr>
+                                </thead>
+                                @foreach ($detail_btn as $det)
+                                    <tbody class="bodyTable">
+                                        <tr>
+                                            <td>{{ $det->jk_waktu }}</td>
+                                            <td>{{ 'Rp.' . number_format($det->pokok, 0, ',', '.') }}</td>
+                                            <td>{{ 'Rp.' . number_format($det->bunga, 0, ',', '.') }}</td>
+                                            <td>{{ 'Rp.' . number_format($det->piutang_pokok, 0, ',', '.') }}</td>
+                                            <td>{{ 'Rp.' . number_format($det->piutang_bunga, 0, ',', '.') }}</td>
+                                        </tr>
+                                    </tbody>
+                                @endforeach
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
             </div>
-        @endif
+        </div>
     </div>
+    </div>
+    {{-- @endif --}}
+    <footer>
+        <p>Copyright 2021 © DITKUAD</p>
+    </footer>
+    <script src="{{ url('assets/vendors/chart.js') }}"></script>
+    <script>
+        const rekapDataKPR = {
+            labels: [
+                'bunga',
+                'pokok'
+            ],
+            datasets: [{
+                label: 'uhuy',
+                data: [25, 75],
+                backgroundColor: [
+                    '#7334FF', '#FF832A'
+                ],
+                hoverOffset: 4
+            }]
+        };
+
+        const configRekapDataKPR = {
+            type: 'doughnut',
+            data: rekapDataKPR,
+            options: {
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                }
+            }
+        };
+        var rekapDataKPRChart = new Chart(
+            document.getElementById('chartRekapData'),
+            configRekapDataKPR
+        );
+
+
+
+        const dataDebiturBaru = {
+            labels: [
+                'Value',
+                'apa'
+            ],
+            datasets: [{
+                label: 'uhuy',
+                data: [85, 15],
+                backgroundColor: [
+                    '#7334FF', '#eee'
+                ],
+                hoverOffset: 4
+            }]
+        };
+
+        const configDebiturBaru = {
+            type: 'doughnut',
+            data: dataDebiturBaru,
+            options: {
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                }
+            }
+        };
+        var chartDebiturBaru = new Chart(
+            document.getElementById('chartDebiturBaru'),
+            configDebiturBaru
+        );
+
+
+
+        const dataDebiturLunas = {
+            labels: [
+                'Value',
+                'apa'
+            ],
+            datasets: [{
+                label: 'uhuy',
+                data: [15, 85],
+                backgroundColor: [
+                    '#DC3545', '#eee'
+                ],
+                hoverOffset: 4
+            }]
+        };
+
+        const configDebiturLunas = {
+            type: 'doughnut',
+            data: dataDebiturLunas,
+            options: {
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                }
+            }
+        };
+        var chartDebiturLunas = new Chart(
+            document.getElementById('chartDebiturLunas'),
+            configDebiturLunas
+        );
+
+
+
+
+
+        const dataDebiturMeninggal = {
+            labels: [
+                'Value',
+                'apa'
+            ],
+            datasets: [{
+                label: 'uhuy',
+                data: [8, 92],
+                backgroundColor: [
+                    '#FF832A', '#eee'
+                ],
+                hoverOffset: 4
+            }]
+        };
+
+        const configDebiturMeninggal = {
+            type: 'doughnut',
+            data: dataDebiturMeninggal,
+            options: {
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                }
+            }
+        };
+        var chartDebiturMeninggal = new Chart(
+            document.getElementById('chartDebiturMeninggal'),
+            configDebiturMeninggal
+        );
+
+
+
+
+
+        const dataDebiturOutstanding = {
+            labels: [
+                'Value',
+                'apa'
+            ],
+            datasets: [{
+                label: 'uhuy',
+                data: [15, 85],
+                backgroundColor: [
+                    '#A2A846', '#eee'
+                ],
+                hoverOffset: 4
+            }]
+        };
+
+        const configDebiturOutstanding = {
+            type: 'doughnut',
+            data: dataDebiturOutstanding,
+            options: {
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                }
+            }
+        };
+        var chartDebiturOutstanding = new Chart(
+            document.getElementById('chartDebiturOutstanding'),
+            configDebiturOutstanding
+        );
+
+        const rekapDataMassDebetBRITunggakan = {
+            labels: [
+                'Value',
+                'apa'
+            ],
+            datasets: [{
+                label: 'uhuy',
+                data: [85, 15],
+                backgroundColor: [
+                    '#FF832A', '#eee'
+                ],
+                hoverOffset: 4
+            }]
+        };
+
+        const configDataMassDebetBRITunggakan = {
+            type: 'doughnut',
+            data: rekapDataMassDebetBRITunggakan,
+            options: {
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                }
+            }
+        };
+        var chartMassDebetTunggakan = new Chart(
+            document.getElementById('chartMassDebetBRITunggakan'),
+            configDataMassDebetBRITunggakan
+        );
+
+
+        const rekapDataMassDebetBRIPinjaman = {
+            labels: [
+                'Value',
+                'apa'
+            ],
+            datasets: [{
+                label: 'uhuy',
+                data: [85, 15],
+                backgroundColor: [
+                    '#A2A846', '#eee'
+                ],
+                hoverOffset: 4
+            }]
+        };
+
+        const configDataMassDebetBRIPinjaman = {
+            type: 'doughnut',
+            data: rekapDataMassDebetBRIPinjaman,
+            options: {
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                }
+            }
+        };
+        var chartMassDebetPinjaman = new Chart(
+            document.getElementById('chartMassDebetBRIPinjaman'),
+            configDataMassDebetBRIPinjaman
+        );
+
+
+        const rekapDataMassDebetBTNTunggakan = {
+            labels: [
+                'Value',
+                'apa'
+            ],
+            datasets: [{
+                label: 'uhuy',
+                data: [85, 15],
+                backgroundColor: [
+                    '#FF832A', '#eee'
+                ],
+                hoverOffset: 4
+            }]
+        };
+
+        const configDataMassDebetBTNTunggakan = {
+            type: 'doughnut',
+            data: rekapDataMassDebetBTNTunggakan,
+            options: {
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                }
+            }
+        };
+        var chartMassDebetBTNTunggakan = new Chart(
+            document.getElementById('chartMassDebetBTNTunggakan'),
+            configDataMassDebetBTNTunggakan
+        );
+
+
+        const rekapDataMassDebetBTNPinjaman = {
+            labels: [
+                'Value',
+                'apa'
+            ],
+            datasets: [{
+                label: 'uhuy',
+                data: [85, 15],
+                backgroundColor: [
+                    '#A2A846', '#eee'
+                ],
+                hoverOffset: 4
+            }]
+        };
+
+        const configDataMassDebetBTNPinjaman = {
+            type: 'doughnut',
+            data: rekapDataMassDebetBTNPinjaman,
+            options: {
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                }
+            }
+        };
+        var chartMassDebetBTNPinjaman = new Chart(
+            document.getElementById('chartMassDebetBTNPinjaman'),
+            configDataMassDebetBTNPinjaman
+        );
+
+        //Penerimaan Rekap
+        const dataPenerimaanTotalPokokBRI = {
+            labels: [
+                'Value',
+                'apa'
+            ],
+            datasets: [{
+                label: 'uhuy',
+                data: [85, 15],
+                backgroundColor: [
+                    '#7334FF', '#eee'
+                ],
+                hoverOffset: 4
+            }]
+        };
+
+        const configPenerimaanTotalPokokBRI = {
+            type: 'doughnut',
+            data: dataPenerimaanTotalPokokBRI,
+            options: {
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                }
+            }
+        };
+        var chartPenerimaanTotalPokokBRI = new Chart(
+            document.getElementById('chartPenerimaanTotalPokokBRI'),
+            configPenerimaanTotalPokokBRI
+        );
+
+
+        const dataPenerimaanTotalPokokBTN = {
+            labels: [
+                'Value',
+                'apa'
+            ],
+            datasets: [{
+                label: 'uhuy',
+                data: [85, 15],
+                backgroundColor: [
+                    '#7334FF', '#eee'
+                ],
+                hoverOffset: 4
+            }]
+        };
+
+        const configPenerimaanTotalPokokBTN = {
+            type: 'doughnut',
+            data: dataPenerimaanTotalPokokBTN,
+            options: {
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                }
+            }
+        };
+        var chartPenerimaanTotalPokokBTN = new Chart(
+            document.getElementById('chartPenerimaanTotalPokokBTN'),
+            configPenerimaanTotalPokokBTN
+        );
+
+
+
+
+        const dataPenerimaanTotalBungaBRI = {
+            labels: [
+                'Value',
+                'apa'
+            ],
+            datasets: [{
+                label: 'uhuy',
+                data: [85, 15],
+                backgroundColor: [
+                    '#DC3545', '#eee'
+                ],
+                hoverOffset: 4
+            }]
+        };
+
+        const configPenerimaanTotalBungaBRI = {
+            type: 'doughnut',
+            data: dataPenerimaanTotalBungaBRI,
+            options: {
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                }
+            }
+        };
+        var chartPenerimaanTotalBungaBRI = new Chart(
+            document.getElementById('chartPenerimaanTotalBungaBRI'),
+            configPenerimaanTotalBungaBRI
+        );
+
+        const dataPenerimaanTotalBungaBTN = {
+            labels: [
+                'Value',
+                'apa'
+            ],
+            datasets: [{
+                label: 'uhuy',
+                data: [85, 15],
+                backgroundColor: [
+                    '#DC3545', '#eee'
+                ],
+                hoverOffset: 4
+            }]
+        };
+
+        const configPenerimaanTotalBungaBTN = {
+            type: 'doughnut',
+            data: dataPenerimaanTotalBungaBTN,
+            options: {
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                }
+            }
+        };
+        var chartPenerimaanTotalBungaBTN = new Chart(
+            document.getElementById('chartPenerimaanTotalBungaBTN'),
+            configPenerimaanTotalBungaBTN
+        );
+
+        //Piutang Rekap
+        const dataPiutangTotalPokokBRI = {
+            labels: [
+                'Value',
+                'apa'
+            ],
+            datasets: [{
+                label: 'uhuy',
+                data: [85, 15],
+                backgroundColor: [
+                    '#7334FF', '#eee'
+                ],
+                hoverOffset: 4
+            }]
+        };
+
+        const configPiutangTotalPokokBRI = {
+            type: 'doughnut',
+            data: dataPiutangTotalPokokBRI,
+            options: {
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                }
+            }
+        };
+        var chartPiutangTotalPokokBRI = new Chart(
+            document.getElementById('chartPiutangTotalPokokBRI'),
+            configPiutangTotalPokokBRI
+        );
+
+
+        const dataPiutangTotalPokokBTN = {
+            labels: [
+                'Value',
+                'apa'
+            ],
+            datasets: [{
+                label: 'uhuy',
+                data: [85, 15],
+                backgroundColor: [
+                    '#7334FF', '#eee'
+                ],
+                hoverOffset: 4
+            }]
+        };
+
+        const configPiutangTotalPokokBTN = {
+            type: 'doughnut',
+            data: dataPiutangTotalPokokBTN,
+            options: {
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                }
+            }
+        };
+        var chartPiutangTotalPokokBTN = new Chart(
+            document.getElementById('chartPiutangTotalPokokBTN'),
+            configPiutangTotalPokokBTN
+        );
+
+        const dataPiutangTotalBungaBRI = {
+            labels: [
+                'Value',
+                'apa'
+            ],
+            datasets: [{
+                label: 'uhuy',
+                data: [85, 15],
+                backgroundColor: [
+                    '#DC3545', '#eee'
+                ],
+                hoverOffset: 4
+            }]
+        };
+
+        const configPiutangTotalBungaBRI = {
+            type: 'doughnut',
+            data: dataPiutangTotalBungaBRI,
+            options: {
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                }
+            }
+        };
+        var chartPiutangTotalBungaBRI = new Chart(
+            document.getElementById('chartPiutangTotalBungaBRI'),
+            configPiutangTotalBungaBRI
+        );
+
+
+        const dataPiutangTotalBungaBTN = {
+            labels: [
+                'Value',
+                'apa'
+            ],
+            datasets: [{
+                label: 'uhuy',
+                data: [85, 15],
+                backgroundColor: [
+                    '#DC3545', '#eee'
+                ],
+                hoverOffset: 4
+            }]
+        };
+
+        const configPiutangTotalBungaBTN = {
+            type: 'doughnut',
+            data: dataPiutangTotalBungaBTN,
+            options: {
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                }
+            }
+        };
+        var chartPiutangTotalBungaBTN = new Chart(
+            document.getElementById('chartPiutangTotalBungaBTN'),
+            configPiutangTotalBungaBTN
+        );
+    </script>
+
+
 @endsection
 @push('script')
+    <script src="https://cdn.jsdelivr.net/npm/@mojs/core"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/noty/3.1.4/noty.min.js"
+        integrity="sha512-lOrm9FgT1LKOJRUXF3tp6QaMorJftUjowOWiDcG5GFZ/q7ukof19V0HKx/GWzXCdt9zYju3/KhBNdCLzK8b90Q=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        $(document).ready(function() {
+            setTimeout(function() {
+                fetch("/kpr/getnotify", {
+                        method: 'GET',
+                    }).then((response) => response.json())
+                    .then((data) => {
+                        for (let i = 0; i < data.length; i++) {
+                            new Noty({
+                                type: 'success',
+                                text: data[i].judul,
+                                theme: 'metroui',
+                                timeout: 2000,
+                                animation: {
+                                    open: function(promise) {
+                                        var n = this;
+                                        var Timeline = new mojs.Timeline();
+                                        var body = new mojs.Html({
+                                            el: n.barDom,
+                                            x: {
+                                                500: 0,
+                                                delay: 0,
+                                                duration: 500,
+                                                easing: 'elastic.out'
+                                            },
+                                            isForce3d: true,
+                                            onComplete: function() {
+                                                promise(function(resolve) {
+                                                    resolve();
+                                                })
+                                            }
+                                        });
+
+                                        var parent = new mojs.Shape({
+                                            parent: n.barDom,
+                                            width: 200,
+                                            height: n.barDom.getBoundingClientRect()
+                                                .height,
+                                            radius: 0,
+                                            x: {
+                                                [150]: -150
+                                            },
+                                            duration: 1.2 * 500,
+                                            isShowStart: true
+                                        });
+
+                                        n.barDom.style['overflow'] = 'visible';
+                                        parent.el.style['overflow'] = 'hidden';
+
+                                        var burst = new mojs.Burst({
+                                            parent: parent.el,
+                                            count: 10,
+                                            top: n.barDom.getBoundingClientRect()
+                                                .height + 75,
+                                            degree: 90,
+                                            radius: 75,
+                                            angle: {
+                                                [-90]: 40
+                                            },
+                                            children: {
+                                                fill: '#EBD761',
+                                                delay: 'stagger(500, -50)',
+                                                radius: 'rand(8, 25)',
+                                                direction: -1,
+                                                isSwirl: true
+                                            }
+                                        });
+
+                                        var fadeBurst = new mojs.Burst({
+                                            parent: parent.el,
+                                            count: 2,
+                                            degree: 0,
+                                            angle: 75,
+                                            radius: {
+                                                0: 100
+                                            },
+                                            top: '90%',
+                                            children: {
+                                                fill: '#EBD761',
+                                                pathScale: [.65, 1],
+                                                radius: 'rand(12, 15)',
+                                                direction: [-1, 1],
+                                                delay: .8 * 500,
+                                                isSwirl: true
+                                            }
+                                        });
+
+                                        Timeline.add(body, burst, fadeBurst, parent);
+                                        Timeline.play();
+                                    },
+                                    close: function(promise) {
+                                        var n = this;
+                                        new mojs.Html({
+                                            el: n.barDom,
+                                            x: {
+                                                0: 500,
+                                                delay: 10,
+                                                duration: 500,
+                                                easing: 'cubic.out'
+                                            },
+                                            skewY: {
+                                                0: 10,
+                                                delay: 10,
+                                                duration: 500,
+                                                easing: 'cubic.out'
+                                            },
+                                            isForce3d: true,
+                                            onComplete: function() {
+                                                promise(function(resolve) {
+                                                    resolve();
+                                                })
+                                            }
+                                        }).play();
+                                    }
+                                }
+                            }).show();
+
+
+                        }
+                        // Push.create(data[0]);
+
+                    });
+
+
+            }, 1000);
+
+
+        });
+    </script>
     <script>
         var ctx = document.getElementById('myBarGraph').getContext('2d');
         var chart = new Chart(ctx, {

@@ -55,6 +55,7 @@ class Kernel extends HttpKernel
     protected $routeMiddleware = [
         'auth' => \App\Http\Middleware\Authenticate::class,
         'ssocheck' => \App\Http\Middleware\checksso::class,
+        'logoutin' => \App\Http\Middleware\logoutin::class,
         'checkaccessapp' => \App\Http\Middleware\checkaccess::class,
         'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
         'bindings' => \Illuminate\Routing\Middleware\SubstituteBindings::class,

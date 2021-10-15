@@ -2,6 +2,7 @@
 
 namespace App;
 
+
 use Illuminate\Database\Eloquent\Model;
 
 class Detailkpr extends Model
@@ -18,7 +19,7 @@ class Detailkpr extends Model
     {
         return $this->belongsTo(Rumah::class);
     }
-    
+
     public function getStatusPinjamAttribute(){
         return $this->status == null || $this->status == 0  || $this->status == 2 ? '<span class="badge badge-danger">BELUM APPROVAL</span>' : '<span class="badge badge-success">SUDAH APPROVAL</span>';
     }

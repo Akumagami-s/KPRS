@@ -1,4 +1,4 @@
-@extends('layouts.app', ['title' => 'KPR | Dashboard' ])
+@extends('layouts.base', ['title' => 'KPR | Dashboard' ])
 @section('dashboard', 'Riwayat Transaksi')
 @section('content')
 <div class="card">
@@ -8,7 +8,7 @@
           <a class="btn btn-danger dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
             Detail Transaction
           </a>
-        
+
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
                     <li><a class="dropdown-item" href="{{ Route('detaildata.all', $user->nrp) }}">Transaction
                             Seluruhnya</a></li>
@@ -18,7 +18,7 @@
                             tidak cukup</a></li>
                 </ul>
         </div>
-    </div>  
+    </div>
     <div class="card-body">
         <div class="row">
             <div class="col-md-12">
@@ -114,7 +114,7 @@
                             <td>{{ $kpr->keterangan }}</td>
                             <td></td>
                         </tr>
-                        
+
                         <tr>
                             <td>Sisa Pinjaman Pokok</td>
                             <td>:</td>
@@ -128,7 +128,7 @@
                             <td>{{  "Rp. " . number_format($total_bunga_piutang, 0,',','.') }}</td>
                             <td></td>
                         </tr>-->
-                        
+
                         <!--<tr>
                             <td>Penerimaan Pokok</td>
                             <td>:</td>
@@ -182,13 +182,13 @@
                             <th class="text-center">Jumlah</th>
                             <th class="text-center">Keterangan</th>
                         </tr>
-                        @php 
+                        @php
                             $ceks = 0 ;
                             $date = 0 ;
                             $id = 1;
                         @endphp
                         @foreach ($transaksi as $item)
-                        @php 
+                        @php
                             $date = date("m Y", strtotime($item->tanggal));
                         @endphp
                         @if ($date != $ceks || $item->status != '0001')
@@ -207,8 +207,8 @@
                         $id++;
                         @endphp
                         @endif
-                        @php 
-                            $ceks  = date("m Y", strtotime($item->tanggal)); 
+                        @php
+                            $ceks  = date("m Y", strtotime($item->tanggal));
                         @endphp
                         @endforeach
                     </table>
@@ -250,7 +250,7 @@
                                     <td>
                                         @foreach ($transaksi as $t)
                                             @if(date('n', strtotime($t->tanggal)) == $j && date('Y', strtotime($t->tanggal)) == $years[$i])
-                                                @php 
+                                                @php
                                                         echo '<i class="fa fa-check"></i>';
                                                         break;
                                                 @endphp

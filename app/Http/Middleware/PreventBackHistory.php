@@ -28,7 +28,7 @@ class PreventBackHistory
     public function handle($request, Closure $next)
 
     {
-
+    $response = $next($request);
        $headers = [
         'Cache-Control'      => 'nocache, no-store, max-age=0, must-revalidate',
         'Pragma'     => 'no-cache',

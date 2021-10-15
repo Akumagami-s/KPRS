@@ -1,11 +1,17 @@
-@extends('layouts.app', ['title' => 'KPR | Pinjaman Approve' ])
+@extends('layouts.basekpr', ['title' => 'KPR | Pinjaman Approve' ])
 @section('content')
+
+<div class="mainContent">
+    <div class="container-fluid">
+        <div class="wrapperContent">
+
+              <div class="wrapperProfilData">
     <div class="card">
         <div class="card-header">
             <div class="row">
                 <div class="col-md-12">
                     <form action="{{ route('admin.detaildata.history', $kpr->nrp) }}" method="get">
-                        <a href="{{ route('admin.detaildata.pinjam', 'approve') }}" class="btn btn-danger">Back</a>
+                        <a href="{{ url()->previous() }}" class="btn btn-danger">Back</a>
                         <a href="{{ route('admin.detaildata.approve.pdf', $kpr->id) }}" class="btn btn-danger"
                             target="_blank">DOWNLOAD <i class="fa fa-print"></i></a>
                         <input type="hidden" name="kpr_id" value="{{ $kpr->id }}">
@@ -250,4 +256,8 @@
 
         </div>
     </div>
+              </div>
+        </div>
+    </div>
+</div>
 @endsection

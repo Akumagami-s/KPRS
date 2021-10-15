@@ -30,4 +30,19 @@ class ApiController extends Controller
 
         return response()->json(['data'=>$data], 200);
     }
+
+    public function index()
+    {
+        $rum = DB::table('rumah')->get();
+
+        return view('kpr.index',['rumah'=>$rum]);
+    }
+
+
+    public function detail($id)
+    {
+        $rum = DB::table('rumah')->where('id',$id)->first();
+
+        return view('kpr.detail',['rumah'=>$rum]);
+    }
 }

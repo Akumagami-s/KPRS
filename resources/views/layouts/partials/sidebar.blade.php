@@ -46,9 +46,7 @@
                         <li><a href="{{ route('admin.detaildata.pinjam', 'approve') }}">Data Massdebet BRI</a></li>
                         <li><a href="{{ route('admin.detaildata.pinjam', 'pending') }}">Data Manual</a></li>
                         <li><a href="{{ route('admin.detaildata.pinjam', 'btn') }}">Data Massdebet BTN</a></li>
-                        <li><a href="{{ route('admin.detaildata.pinjam', 'belomapprove') }}">Data Debitur Baru</a></li>
-                        <li><a href="{{ route('admin.detaildata.pinjam', 'lunas') }}">Data Debitur Lunas</a></li>
-                        <li><a href="{{ route('admin.detaildata.pinjam', 'meninggal') }}">Data Debitur Meninggal</a></li>
+                        <li><a href="{{ route('admin.detaildata.pinjam', 'debitur') }}">Data Debitur</a></li>
                         <li><a href="{{ route('admin.detaildata.pinjam', 'outstanding') }}">Data Outstanding</a></li>
                         <li><a href="{{ route('admin.detaildata.pinjam', 'penerimaan') }}">Data penerimaan</a></li>
                         <li><a href="{{ route('admin.detaildata.pinjam', 'rekapbulanan') }}">Data Rekap Bulanan</a></li>
@@ -72,18 +70,18 @@
                         <li><a href="{{ route('admin.fasilitas.index') }}">Data Fasilitas</a></li>
                    </ul>
                 </li>
-                <li class="sidebar-list"><a class="sidebar-link sidebar-title link-nav" href="{{ route('admin.pengajuan.index') }}"><i data-feather="user-check"> </i><span>Pengajuan</span></a></li>
+                {{-- <li class="sidebar-list"><a class="sidebar-link sidebar-title link-nav" href="{{ route('admin.pengajuan.index') }}"><i data-feather="user-check"> </i><span>Pengajuan</span></a></li> --}}
                 <li class="sidebar-list"><a class="sidebar-link sidebar-title link-nav" href="{{ route('kalkulator') }}"><i data-feather="dollar-sign"></i><span>Simulasi
                             KPR</span></a></li>
                 {{-- @endif --}}
-                <li class="sidebar-list"><a class="sidebar-link sidebar-title" href="#"><i data-feather="users"></i><span>SANDBOX</span></a>
+                <li class="sidebar-list"><a class="sidebar-link sidebar-title" href="#"><i data-feather="codesandbox"></i><span>SANDBOX</span></a>
                     <ul class="sidebar-submenu">
                         <li><a href="{{ route('sandbox.index') }}">Sandbox</a></li>
 
                     </ul>
                 </li>
 
-                <li class="sidebar-list"><a class="sidebar-link sidebar-title" href="#"><i data-feather="users"></i><span>LOCATE</span></a>
+                <li class="sidebar-list"><a class="sidebar-link sidebar-title" href="#"><i data-feather="map"></i><span>LOCATE</span></a>
                     <ul class="sidebar-submenu">
                         <li><a href="{{ route('locate.index') }}">Locate</a></li>
 
@@ -212,3 +210,6 @@
     </nav>
     @endif
 </div>
+
+
+

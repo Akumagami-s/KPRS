@@ -18,7 +18,12 @@ use Illuminate\Support\Facades\Session;
 use App\Riwayat;
 use App\Rumah;
 use App\Transaksi;
+use Illuminate\Support\Facades\Http;
 
+// use Illuminate\Support\Facades\Auth;
+// use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
+// use Closure;
 class HomeController extends Controller
 {
     /**
@@ -28,8 +33,8 @@ class HomeController extends Controller
      */
     public function __construct()
     {
-        ini_set('max_execution_time', 300000);
-        $this->middleware('auth');
+
+        // $this->middleware('auth');
     }
 
     /**
@@ -37,8 +42,10 @@ class HomeController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
-    public function index()
+    public function index(Request $request)
     {
+
+
 
 
         $nrp = Auth::user()->nrp;
@@ -67,17 +74,14 @@ class HomeController extends Controller
             $riwayat = Riwayat::where('nrp',$nrp)->first();
             $transaksi = Transaksi::where('nrp',$nrp)->get();
 
-            $ambil_tahun = DB::table('transaksi')->where('nrp', $nrp)
-                ->select(DB::raw('thn as year'))->distinct()->orderByDesc('thn')->get();
-            $years = $ambil_tahun->pluck('year');
+            // $ambil_tahun = DB::table('transaksi')->where('nrp', $nrp)
+            //     ->select(DB::raw('thn as year'))->distinct()->orderByDesc('thn')->get();
+            // $years = $ambil_tahun->pluck('year');
 
 
             $besar_pinjaman = $kpr->pinjaman;
             $bunga = 6;
             $jangka = $kpr->jk_waktu;
-            // 10000000
-            // 120
-            // 6
 
 
 
@@ -87,17 +91,14 @@ class HomeController extends Controller
 
 
 
-            // bunga 6%
-            // tahunnya 10
-
 
 
             $c = pow((1 + $bungapersen), $tahun);
 
-            //  1.7
+
 
             $d = $c - 1;
-            // 0.7
+
 
             $fax = ($bungapersen * $c) / $d;
             $anuitas = round($fax, 6);
@@ -108,11 +109,7 @@ class HomeController extends Controller
             if ($besar_angsuran != $kpr->jml_angs) {
                 $besar_angsuran = round($besar_angsur, -3) + 1000;
             }
-            // if (substr($a, -2) >= 1) {
-            // }
-            // dd($besar_angsuran);
-            //angsuran bunga = pinjaman pokok * bungapersen/ 12-24-36-48-60-72-84-96
-            // $besar_angsuran = besarAngsuran($besar_pinjaman,$getAnuitas);
+
             $array1 = [0 => null];
             $array2 = [0 => null];
             $array3 = [0 => intval($besar_pinjaman)];
@@ -156,26 +153,7 @@ class HomeController extends Controller
                 array_push($array3, $besar_pinjaman);
             }
 
-            // for ($z = $bulan; $z < $jangka+1; $z++) {
-            //     if ($z == 13 ||$no == 13) {
-            //         $ang_bunga_utang = $besar_pinjaman * $bungapersen / 12;
-            //         $angsuran_bunga_utang = round($ang_bunga_utang);
-            //         $angsuran_pokoks_utang = $besar_angsuran - $angsuran_bunga;
-            //         $angsuran_pokok_utang = round($angsuran_pokoks_utang);
-            //         $no = 1;
-            //     }
 
-            //     $no++;
-            //         array_push($array_utang1, $angsuran_bunga_utang);
-            //         array_push($array_utang2, $angsuran_pokok_utang);
-            //         array_push($array_utang4, $besar_angsuran);
-            //     $besar_pinjaman -= $array2[$b];
-            //     $b++;
-            //     array_push($array3, $besar_pinjaman);
-
-            //     echo $z . "." . $angsuran_bunga_utang . "<br>";
-            // }
-            // dd();
             $saldo_bunga_total = array_sum(array_slice($array1, 0, $kpr->angsuran_masuk+1));
             $saldo_pokok_total = array_sum(array_slice($array2, 0, $kpr->angsuran_masuk+1));
 
@@ -211,7 +189,7 @@ class HomeController extends Controller
                 ->select(DB::raw('YEAR(tanggal) as year'))->distinct()->orderByDesc('tanggal')->get();
             $years = $ambil_tahun->pluck('year');
 
-            return view('dashboard',[
+            return view('index',[
                 'transaksi' => DB::table('TrxBri')->where('nrp',$nrp)->whereNotNull('rekeningdebet')->orderBy('tanggal','ASC')->get(),
                 'jumlah' => DB::table('kpr')->select('jml_angs')->where('nrp',$nrp)->first(),
                 'angsuran_masuk' => $kpr->angsuran_masuk,
@@ -233,8 +211,13 @@ class HomeController extends Controller
         }
 
         if(Auth::user()->role == '2' && empty($cekkpr)){
-            $rumahs = Rumah::where('status', 0)->latest()->paginate(5);
-            return view('rumah', compact('rumahs'));
+            // $rumahs = Rumah::where('status', 0)->latest()->paginate(5);
+
+
+            // $respo nse = Http::get('http://example.com');
+
+
+            return view('index');
         }
         $ambil_tahun = DB::table('kpr')->select(DB::raw('YEAR(tmt_angsuran) as year'))->distinct()->orderBy('tmt_angsuran')->get();
         $years = $ambil_tahun->pluck('year');
@@ -334,6 +317,14 @@ class HomeController extends Controller
         $jumlahpinjaman = Detailkpr::where('status','!=',3)->sum('pinjaman');
         $totaltunggakan = Detailkpr::where('status','!=',3)->sum('jml_tunggakan');
 
+            //rumus rekap
+
+            $debiturbaru = Detailkpr::where('status', 2)->count();
+            $debiturlunas = Detailkpr::where('status', 4)->count();
+            $debiturmeninggal = Detailkpr::where('status', 5)->count();
+            $hutangpokok = Detailkpr::sum('piutang_pokok');
+            $tunggakanbunga = Detailkpr::sum('tunggakan_bunga');
+            $rekapoutstanding = $hutangpokok + $tunggakanbunga;
 
         //btn
 
@@ -362,7 +353,8 @@ class HomeController extends Controller
         $chart->dataset = (array_values($groups));
         $chart->colours = $colours;
 
-        return view('home', compact('chart'), [
+
+        return view('index', compact('chart'), [
             'total_pokok_otomatis' => $total_pokok_otomatis,
             'total_bunga_otomatis' => $total_bunga_otomatis,
             'total_pokok_tahun' => $total_pokok_tahun,
@@ -374,6 +366,11 @@ class HomeController extends Controller
             'pengelola' => User::where('role', 1)->count(),
             'admin' => User::where('role', 0)->count(),
             // 'pangkats' => Pangkat::count(),
+
+            'debiturbaru' => $debiturbaru,
+            'debiturlunas' => $debiturlunas,
+            'debiturmeninggal' => $debiturmeninggal,
+            'rekapoutstanding' => $rekapoutstanding,
 
 
             'total_pokok' => $total_pokok,
@@ -394,288 +391,7 @@ class HomeController extends Controller
             'user_btn' => Detailkpr::where('status',3)->count(),
             'detail_btn' => $detail_btn
         ]);
-        // PERHITUNGAN OTOMATIS
-        // $data = ini_set('max_execution_time',100200);
-        // dd(ini_get_all());
 
-        // $ambil_tahun = DB::table('kpr')->select(DB::raw('YEAR(tmt_angsuran) as year'))->distinct()->orderBy('tmt_angsuran')->get();
-        // $years = $ambil_tahun->pluck('year');
-
-        // $year = Carbon::now()->format('Y');
-        // $tahunini = DB::table('kpr')->whereYear('tmt_angsuran', $year);
-        // $jumlahpinjamantahun = $tahunini->sum('pinjaman');
-        // $totaltunggakantahun = $tahunini->sum('jml_tunggakan');
-        // $total_pokok_tahun = $tahunini->sum('pokok');
-        // $total_bunga_tahun = $tahunini->sum('bunga');
-        // $detail_btn = Detailkpr::select('jk_waktu', 'bunga', 'pokok', 'piutang_bunga', 'piutang_pokok', DB::raw('count(*) as total, SUM(bunga) as bunga, SUM(pokok) as pokok, SUM(piutang_bunga) as piutang_bunga, SUM(piutang_pokok) as piutang_pokok'))->where('status', 3)->groupBy('jk_waktu')->get();
-        // $detail_kpr = Detailkpr::select('jk_waktu', 'bunga', 'pokok', 'piutang_bunga', 'piutang_pokok', DB::raw('count(*) as total, SUM(bunga) as bunga, SUM(pokok) as pokok, SUM(piutang_bunga) as piutang_bunga, SUM(piutang_pokok) as piutang_pokok'))->where('status', '!=', 3)->groupBy('jk_waktu')->get();
-        // $piutang_bunga = Detailkpr::where('status', '!=', 3)->sum('piutang_bunga');
-        // $piutang_pokok = Detailkpr::where('status', '!=', 3)->sum('piutang_pokok');
-        // $piutang_bunga_btn = Detailkpr::where('status', 3)->sum('piutang_bunga');
-        // $piutang_pokok_btn = Detailkpr::where('status', 3)->sum('piutang_pokok');
-        // // ini_set('max_execution_time',100200);
-        // // dd(ini_get_all());
-        // // $count = Detailkpr::count();
-        // //START
-
-        // $kpr = Detailkpr::where('status', '!=', 3)->get()->take(500);
-        // $btn = Detailkpr::where('status', 3)->get()->take(500);
-
-        // // dd($kpr->count(),$btn->count(),Detailkpr::all()->count());
-        // // init var for global
-        // $array_orang_pokok_piutang = [0 => ''];
-        // $array_orang_bunga_piutang = [0 => ''];
-
-        // $bunga = 6;
-        // //init var for kpr
-        // $besar_pinjaman_kpr = [0 => ''];
-        // $jangka_kpr = [0 => ''];
-        // $angs_ke_kpr = [0 => ''];
-        // $id_kpr = [0 => ''];
-        // $jml_angs_kpr = [0 => ''];
-        // $angsuran_masuk_kpr = [0 => ''];
-        // $penerimaan_bunga_kpr = [0 => ''];
-        // $penerimaan_pokok_kpr = [0 => ''];
-        // $piutang_pokok_kpr = [0 => ''];
-        // $piutang_bunga_kpr = [0 => ''];
-        // $tmt_angsuran_kpr = [0 => ''];
-        // //init var for btn
-        // $besar_pinjaman_btn = [0 => ''];
-        // $jangka_btn = [0 => ''];
-        // $angs_ke_btn = [0 => ''];
-        // $id_btn = [0 => ''];
-        // $jml_angs_btn = [0 => ''];
-        // $angsuran_masuk_btn = [0 => ''];
-        // $penerimaan_bunga_btn = [0 => ''];
-        // $penerimaan_pokok_btn = [0 => ''];
-        // $piutang_pokok_btn = [0 => ''];
-        // $piutang_bunga_btn = [0 => ''];
-        // $tmt_angsuran_btn = [0 => ''];
-
-        // //foreach for kpr
-        // foreach ($kpr as $key) {
-        //     array_push($id_kpr, $key->id);
-        //     array_push($besar_pinjaman_kpr, $key->pinjaman);
-        //     array_push($jangka_kpr, $key->jk_waktu);
-        //     array_push($angs_ke_kpr, $key->angs_ke);
-        //     array_push($jml_angs_kpr, $key->jml_angs);
-        //     array_push($angsuran_masuk_kpr, $key->angsuran_masuk);
-        //     array_push($tmt_angsuran_kpr, $key->tmt_angsuran);
-        // }
-        // for ($index = 1; $index < count($id_kpr); $index++) {
-        //     //tentuin bunga ke persen 6 ke 6%
-        //     $bungapersen = $bunga / 100;
-        //     // tentuin tahun dari jangka
-        //     $tahun = $jangka_kpr[$index] / 12;
-        //     // ===>mencari anuitas<===
-        //     $c = pow((1 + $bungapersen), $tahun);
-        //     $d = $c - 1;
-        //     $fax = ($bungapersen * $c) / $d;
-        //     $anuitas = round($fax, 6);
-        //     // ===>mencari anuitas<===
-
-        //     $besar_angsur = ($besar_pinjaman_kpr[$index] * $anuitas) / 12;
-        //     $besar_angsuran = round($besar_angsur, -3);
-        //     if ($besar_angsuran != $jml_angs_kpr[$index]) {
-        //         $besar_angsuran = round($besar_angsur, -3) + 1000;
-        //     }
-        //     $array_bunga = [0 => ''];
-        //     $array_pokok = [0 => ''];
-
-        //     $array_pinjaman = [0 => ''];
-
-        //     $no = 1;
-        //     $angsuran_bunga = $besar_pinjaman_kpr[$index] * $bungapersen / 12;
-        //     $angsuran_pokok = $besar_angsuran - $angsuran_bunga;
-
-        //     $bulan = (int) date('m', strtotime($tmt_angsuran_kpr[$index]));
-        //     $b = 1;
-        //     for ($i = $bulan; $i < $angsuran_masuk_kpr[$index] + $bulan; $i++) {
-        //         if ($i == 13 || $no == 13) {
-        //             $ang_bunga = $besar_pinjaman_kpr[$index] * $bungapersen / 12;
-        //             $angsuran_bunga = round($ang_bunga);
-        //             $angsuran_pokoks = $besar_angsuran - $angsuran_bunga;
-        //             $angsuran_pokok = round($angsuran_pokoks);
-        //             $no = 1;
-        //         }
-        //         $no++;
-        //         array_push($array_bunga, $angsuran_bunga);
-        //         array_push($array_pokok, $angsuran_pokok);
-        //         $besar_pinjaman_kpr[$index] -= $array_pokok[$b];
-        //         $b++;
-        //         array_push($array_pinjaman, $besar_pinjaman_kpr[$index]);
-        //     }
-        //     array_push($penerimaan_bunga_kpr, array_sum($array_bunga));
-        //     array_push($penerimaan_pokok_kpr, array_sum($array_pokok));
-        //     for ($i = $bulan; $i < $jangka_kpr[$index] + $bulan; $i++) {
-
-        //         if ($i == 13 || $no == 13) {
-        //             $ang_bunga = $besar_pinjaman_kpr[$index] * $bungapersen / 12;
-        //             $angsuran_bunga = round($ang_bunga);
-        //             $angsuran_pokoks = $besar_angsuran - $angsuran_bunga;
-        //             $angsuran_pokok = round($angsuran_pokoks);
-        //             $no = 1;
-        //         }
-
-        //         $no++;
-        //         array_push($array_bunga, $angsuran_bunga);
-        //         array_push($array_pokok, $angsuran_pokok);
-
-        //         $besar_pinjaman_kpr[$index] -= $array_pokok[$b];
-        //         $b++;
-        //         array_push($array_pinjaman, $besar_pinjaman_kpr);
-        //     }
-        //     $utang_bunga_total = array_sum(array_slice($array_bunga, $angsuran_masuk_kpr[$index], $jangka_kpr[$index]));
-        //     $utang_pokok_total = array_sum(array_slice($array_pokok, $angsuran_masuk_kpr[$index], $jangka_kpr[$index]));
-        //     array_push($piutang_bunga_kpr, $utang_bunga_total);
-        //     array_push($piutang_pokok_kpr, $utang_pokok_total);
-        // }
-        // $penerimaan_bunga_kpr;
-        // $penerimaan_pokok_kpr;
-        // $piutang_bunga_kpr;
-        // $piutang_pokok_kpr;
-        // $index = 0;
-        // foreach ($btn as $key) {
-        //     array_push($id_btn, $key->id);
-        //     array_push($besar_pinjaman_btn, $key->pinjaman);
-        //     array_push($jangka_btn, $key->jk_waktu);
-        //     array_push($angs_ke_btn, $key->angs_ke);
-        //     array_push($jml_angs_btn, $key->jml_angs);
-        //     array_push($angsuran_masuk_btn, $key->angsuran_masuk);
-        //     array_push($tmt_angsuran_btn, $key->tmt_angsuran);
-        // }
-        // for ($index = 1; $index < count($id_btn); $index++) {
-        //     //tentuin bunga ke persen 6 ke 6%
-        //     $bungapersen = $bunga / 100;
-        //     // tentuin tahun dari jangka
-        //     $tahun = $jangka_btn[$index] / 12;
-        //     // ===>mencari anuitas<===
-        //     $c = pow((1 + $bungapersen), $tahun);
-        //     $d = $c - 1;
-        //     $fax = ($bungapersen * $c) / $d;
-        //     $anuitas = round($fax, 6);
-        //     // ===>mencari anuitas<===
-
-        //     $besar_angsur = ($besar_pinjaman_btn[$index] * $anuitas) / 12;
-        //     $besar_angsuran = round($besar_angsur, -3);
-        //     if ($besar_angsuran != $jml_angs_btn[$index]) {
-        //         $besar_angsuran = round($besar_angsur, -3) + 1000;
-        //     }
-        //     $array_bunga = [0 => ''];
-        //     $array_pokok = [0 => ''];
-
-        //     $array_pinjaman = [0 => ''];
-
-        //     $no = 1;
-        //     $angsuran_bunga = $besar_pinjaman_btn[$index] * $bungapersen / 12;
-        //     $angsuran_pokok = $besar_angsuran - $angsuran_bunga;
-
-        //     $bulan = (int) date('m', strtotime($tmt_angsuran_btn[$index]));
-        //     $b = 1;
-        //     for ($i = $bulan; $i < $angsuran_masuk_btn[$index] + $bulan; $i++) {
-        //         if ($i == 13 || $no == 13) {
-        //             $ang_bunga = $besar_pinjaman_btn[$index] * $bungapersen / 12;
-        //             $angsuran_bunga = round($ang_bunga);
-        //             $angsuran_pokoks = $besar_angsuran - $angsuran_bunga;
-        //             $angsuran_pokok = round($angsuran_pokoks);
-        //             $no = 1;
-        //         }
-        //         $no++;
-        //         array_push($array_bunga, $angsuran_bunga);
-        //         array_push($array_pokok, $angsuran_pokok);
-        //         $besar_pinjaman_btn[$index] -= $array_pokok[$b];
-        //         $b++;
-        //         array_push($array_pinjaman, $besar_pinjaman_btn[$index]);
-        //     }
-        //     array_push($penerimaan_bunga_btn, array_sum($array_bunga));
-        //     array_push($penerimaan_pokok_btn, array_sum($array_pokok));
-        //     for ($i = $bulan; $i < $jangka_btn[$index] + $bulan; $i++) {
-
-        //         if ($i == 13 || $no == 13) {
-        //             $ang_bunga = $besar_pinjaman_btn[$index] * $bungapersen / 12;
-        //             $angsuran_bunga = round($ang_bunga);
-        //             $angsuran_pokoks = $besar_angsuran - $angsuran_bunga;
-        //             $angsuran_pokok = round($angsuran_pokoks);
-        //             $no = 1;
-        //         }
-
-        //         $no++;
-        //         array_push($array_bunga, $angsuran_bunga);
-        //         array_push($array_pokok, $angsuran_pokok);
-
-        //         $besar_pinjaman_btn[$index] -= $array_pokok[$b];
-        //         $b++;
-        //         array_push($array_pinjaman, $besar_pinjaman_btn);
-        //     }
-        //     $utang_bunga_total = array_sum(array_slice($array_bunga, $angsuran_masuk_btn[$index], $jangka_btn[$index]));
-        //     $utang_pokok_total = array_sum(array_slice($array_pokok, $angsuran_masuk_btn[$index], $jangka_btn[$index]));
-        //     array_push($piutang_bunga_btn, $utang_bunga_total);
-        //     array_push($piutang_pokok_btn, $utang_pokok_total);
-        // }
-        // $penerimaan_pokok_btn;
-        // $piutang_bunga_btn;
-        // $piutang_pokok_btn;
-
-        // $total_pokok = Detailkpr::where('status', '!=', 3)->sum('pokok');
-        // $total_bunga = Detailkpr::where('status', '!=', 3)->sum('bunga');
-
-        // $jumlahpinjaman = Detailkpr::where('status', '!=', 3)->sum('pinjaman');
-        // $totaltunggakan = Detailkpr::where('status', '!=', 3)->sum('jml_tunggakan');
-
-
-        // //btn
-        // $total_pokok_btn = Detailkpr::where('status', 3)->sum('pokok');
-        // $total_bunga_btn = Detailkpr::where('status', 3)->sum('bunga');
-
-        // $jumlahpinjaman_btn = Detailkpr::where('status', 3)->sum('pinjaman');
-        // $totaltunggakan_btn = Detailkpr::where('status', 3)->sum('jml_tunggakan');
-
-        // $users = User::select(DB::raw("COUNT(*) as count"))
-        //     ->whereYear('created_at', date('Y'))
-        //     ->groupBy(DB::raw("Month(created_at)"))
-        //     ->pluck('count')->all();
-
-        // $groups = User::select('role', DB::raw('count(*) as total'))
-        //     ->groupBy('role')
-        //     ->pluck('total', 'role')->all();
-
-        // for ($i = 0; $i <= count($groups); $i++) {
-        //     $colours[] = '#' . substr(str_shuffle('ABCDEF0123456789'), 0, 6);
-        // }
-
-        // $chart = new Chart;
-        // $chart->labels = (array_keys($groups));
-        // $chart->dataset = (array_values($groups));
-        // $chart->colours = $colours;
-
-        // return view('home', compact('chart'), [
-        //     'total_pokok_tahun' => $total_pokok_tahun,
-        //     'total_bunga_tahun' => $total_bunga_tahun,
-        //     'jumlahpinjamantahun' => $jumlahpinjamantahun,
-        //     'totaltunggakantahun' => $totaltunggakantahun,
-        //     'years' => $years,
-
-        //     'pengelola' => User::where('role', 1)->count(),
-        //     'admin' => User::where('role', 0)->count(),
-        //     'pangkats' => Pangkat::count(),
-        //     'total_pokok' => array_sum($penerimaan_pokok_kpr),
-        //     'total_bunga' => array_sum($penerimaan_bunga_kpr),
-        //     'jumlahpinjaman' => $jumlahpinjaman,
-        //     'totaltunggakan' => $totaltunggakan,
-        //     'piutang_bunga' => array_sum($piutang_bunga_kpr),
-        //     'piutang_pokok' => array_sum($piutang_pokok_kpr),
-        //     'user' => Detailkpr::where('status', '!=', 3)->count(),
-        //     'detail_kpr' => $detail_kpr,
-
-        //     'total_pokok_btn' => array_sum($penerimaan_pokok_btn),
-        //     'total_bunga_btn' => array_sum($penerimaan_bunga_btn),
-        //     'jumlahpinjaman_btn' => $jumlahpinjaman_btn,
-        //     'totaltunggakan_btn' => $totaltunggakan_btn,
-        //     'piutang_bunga_btn' => array_sum($piutang_bunga_btn),
-        //     'piutang_pokok_btn' => array_sum($piutang_pokok_btn),
-        //     'user_btn' => Detailkpr::where('status', 3)->count(),
-        //     'detail_btn' => $detail_btn
-        // ]);
     }
 
 
@@ -1231,7 +947,7 @@ class HomeController extends Controller
 
     public function kalkulator()
     {
-        return view('admin.kalkulator.index');
+        return view('calculate.kalkulator');
     }
     public function HitungKalkulator(Request $request)
     {
@@ -1242,7 +958,7 @@ class HomeController extends Controller
         $data = app('App\Http\Controllers\AnuitasController')->TabelAngsuran($bln,$request->besar_pinjam,$request->jangka,$request->bunga);
 
 
-        return view('admin.kalkulator.show', [
+        return view('calculate.show', [
             'all' => $data[0],
             'besar_angsuran' => $data[1],
             'no' => intval($request->jangka)

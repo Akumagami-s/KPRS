@@ -111,6 +111,11 @@ return [
         'heading_row' => [
             'formatter' => 'slug',
         ],
+        'imports' => [
+            'heading_row' => [
+                'formatter' => 'custom',
+            ],
+        ],
 
         /*
         |--------------------------------------------------------------------------
@@ -239,7 +244,7 @@ return [
         |
         */
         'batch'     => [
-            'memory_limit' => 60000,
+            'memory_limit' => 600000,
         ],
 
         /*

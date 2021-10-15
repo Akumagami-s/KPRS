@@ -19,3 +19,5 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 Route::get('dataKpr/{status}', 'ApiController@dataKpr')->name('dataKpr');
+Route::get('index', 'ApiController@index')->name('index');
+Route::get('detail/{id}', 'ApiController@detail')->name('detail');

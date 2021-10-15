@@ -6,15 +6,12 @@ use Maatwebsite\Excel\Concerns\FromCollection;
 use App\Detailkpr;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
-
 use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
-
-
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
-class RekapbulananExport implements FromCollection
+class RekapbulananExport implements FromCollection, WithHeadings, WithStyles, WithColumnFormatting, ShouldAutoSize
 {
     protected $bulan;
     protected $tahun;
@@ -57,7 +54,7 @@ class RekapbulananExport implements FromCollection
             'inisial_bunga',
             'inisial_pokok',
             'piutang_bunga',
-            'piutang_pokok',
+            'piutang_pokok'
         )->where("tmt_angsuran", $tgl)->get();
         $data = collect($detailkpr)->map(function ($detailkpr, $key) {
             $collect = (object)$detailkpr;
@@ -67,18 +64,19 @@ class RekapbulananExport implements FromCollection
                 'nrp' => $collect->nrp.' ',
                 'kesatuan' => $collect->kesatuan,
                 'kotama' => $collect->kotama,
-                'alamat' => $collect->alamat,
                 'tahap' => $collect->tahap,
                 'pinjaman' => $collect->pinjaman,
                 'jk_waktu' => $collect->jk_waktu,
                 'tmt_angsuran' => $collect->tmt_angsuran,
                 'jml_angs' => $collect->jml_angs,
+                'angs_ke' => $collect->angs_ke,
+                'angsuran_masuk' => $collect->angsuran_masuk,
                 'tunggakan' => $collect->tunggakan,
                 'jml_tunggakan' => $collect->jml_tunggakan,
                 'tunggakan_pokok' => $collect->tunggakan_pokok,
                 'tunggakan_bunga' => $collect->tunggakan_bunga,
                 'keterangan' => $collect->keterangan,
-                'rekening' => $collect->rekening,
+                'rekening' => $collect->rekening.' ',
                 'rek_bri' => $collect->rek_bri.' ',
                 'rek_btn' => $collect->rek_btn.' ',
                 'bunga' => $collect->bunga,
@@ -87,43 +85,45 @@ class RekapbulananExport implements FromCollection
                 'inisial_bunga' => $collect->inisial_bunga,
                 'inisial_pokok' => $collect->inisial_pokok,
                 'piutang_bunga' => $collect->piutang_bunga,
-                'piutang_pokok' => $collect->piutang_pokok
+                'piutang_pokok' => $collect->piutang_pokok,
+                'outstanding' => $collect->piutang_pokok + $collect->tunggakan_bunga
             ];
         });
-        ini_set('memory_limit', '-1');
+        // ini_set('memory_limit', '-1');
+        ini_set('max_execution_time', 1500);
         return $data;
     }
     public function headings(): array
     {
         return [
-            'nama',
-            'pangkat',
-            'nrp',
-            'kesatuan',
-            'kotama',
-            'alamat',
-            'tahap',
-            'pinjaman',
-            'jk_waktu',
-            'tmt_angsuran',
-            'jml_angs',
-            'angs_ke',
-            'angsuran_masuk',
-            'tunggakan',
-            'jml_tunggakan',
-            'tunggakan_pokok',
-            'tunggakan_bunga',
-            'keterangan',
-            'rekening',
-            'rek_bri',
-            'rek_btn',
-            'bunga',
-            'pokok',
-            'sisa_pinjaman_pokok',
-            'inisial_bunga',
-            'inisial_pokok',
-            'piutang_bunga',
-            'piutang_pokok'
+            "nama",
+            "pangkat",
+            "nrp",
+            "kesatuan",
+            "kotama",
+            "tahap",
+            "pinjaman",
+            "jk_waktu",
+            "tmt_angsuran",
+            "jml_angs",
+            "angs_ke",
+            "angsuran_masuk",
+            "tunggakan",
+            "jml_tunggakan",
+            "tunggakan_pokok",
+            "tunggakan_bunga",
+            "keterangan",
+            "rekening",
+            "rek_bri",
+            "rek_btn",
+            "bunga",
+            "pokok",
+            "sisa_pinjaman_pokok",
+            "inisial_bunga",
+            "inisial_pokok",
+            "piutang_bunga",
+            "piutang_pokok",
+            "outstanding"
         ];
     }
     public function styles(Worksheet $sheet)

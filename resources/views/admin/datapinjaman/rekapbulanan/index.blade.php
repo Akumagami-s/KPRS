@@ -13,6 +13,40 @@
                         </div>
                     </div>
                 </div>
+                <div class="pull-right">
+                    <form action="{{ route('admin.detaildata.carirekap') }}" method="GET" class="form-group">
+                        {{ csrf_field() }}
+                         <select style="cursor:pointer;" class="form-control" id="tag_select" name="year">
+                        <option value="0" selected disabled> Pilih Tahun</option>
+                        <?php
+                         $year = date('Y');
+                         $min = $year - 12;
+                         $max = $year;
+                         for( $i=$max; $i>=$min; $i-- ) {
+                        echo '<option value='.$i.'>'.$i.'</option>';
+                                              }
+                        ?>
+                         </select>
+                         <select style="cursor:pointer;margin-top:1.5em;margin-bottom:1.5em;" class="form-control" id="tag_select" name="month">
+                        <option value="0" selected disabled> Pilih Bulan</option>
+                        <option value="1"> Januari</option>
+                        <option value="2"> Februari</option>
+                        <option value="3"> Maret</option>
+                        <option value="4"> April</option>
+                        <option value="5"> Mei</option>
+                        <option value="6"> Juni</option>
+                        <option value="7"> Juli</option>
+                        <option value="8"> Agustus</option>
+                        <option value="9"> September</option>
+                        <option value="10"> Oktober</option>
+                        <option value="11"> November</option>
+                        <option value="12"> Desember</option>
+                        </select>
+                <div class="inpit-group mb-3">
+                    <button class="btn btn-danger" type="submit">Cari</button>
+                    {{-- <a class="btn btn-primary" href="{{ route('admin.detaildata.RekapBulanan', ['bulan'=>$_GET['month'], 'tahun'=>$_GET['year']]) }}">Expot</a> --}}
+                </div>
+                </div>
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table table-hover table-bordered" width="100%">
@@ -46,6 +80,7 @@
                                     <th>Inisial Pokok</th>
                                     <th>Hutang Pokok</th>
                                     <th>Hutang Bunga</th>
+                                    <th>Outstanding</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -184,6 +219,9 @@
                     },
                     {
                         data: "piutang_bunga"
+                    },
+                    {
+                        data: "outstanding"
                     },
                 ],
             });

@@ -1,9 +1,16 @@
-@extends('layouts.app', ['title' => 'KPR | Update Pinjaman' ])
+@extends('layouts.basekpr', ['title' => 'KPR | Update Pinjaman' ])
 @section('content')
-    <div class="card">
+<div class="mainContent">
+    <div class="container-fluid">
+        <div class="wrapperContent">
+            <h2 class="nameContent">Update Data Transaksi Pembayaran KPR TWP AD</h2>
+
+            <div class="wrapperUpdateData">
+
+    {{-- <div class="card">
         <div class="card-header">
             <h5>Update Data Transaksi Pembayaran KPR TWP AD</h5>
-        </div>
+        </div> --}}
         <div class="card-body">
             <div class="row">
                 <div class="col-md-12">
@@ -148,6 +155,9 @@
             @endif
         </div>
 
+        </div>
+
+        </div>
         </div>
         </div>
     @endsection

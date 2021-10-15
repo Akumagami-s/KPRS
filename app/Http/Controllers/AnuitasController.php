@@ -37,7 +37,11 @@ class AnuitasController extends Controller
         $ang = $bln;
 
         for ($i = 1; $i < $jangka + 1; $i++) {
-        if($bln == 13){
+            // if () {
+            //     # code...
+            // }
+        
+            if($bln == 13){
               $ang_bunga = $besar_pinjaman * $bunga / 12;
                 $angsuran_bunga = round($ang_bunga, 2);
                 $angsuran_pokok = $besar_angsuran - $angsuran_bunga;

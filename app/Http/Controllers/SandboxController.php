@@ -15,7 +15,6 @@ class SandboxController extends Controller
         public function index()
         {
             // Sandbox dimulai dengan parameternya NRP user asli
-
             $sand = sandboxAcc::where('ref',Auth::user()->nrp)->first();
             if(is_null($sand)){
                 return view('sandbox.index');
@@ -28,13 +27,15 @@ class SandboxController extends Controller
                 $bln = intval($bln[1]);
 
                 $data = app('App\Http\Controllers\AnuitasController')->TabelAngsuran($bln,$sand->pinjaman,$sand->jk_waktu);
-
                 return view('sandbox.index',['acc'=>$sand,'all' => $data[0],'besar_angsuran' => $data[1],'no' => intval($sand->jk_waktu)]);
             }
         }
 
         public function createKpr(Request $request)
         {
+            $time = Carbon::now();
+            $thisTime = Carbon::create($time->year, $time->month, $time->day, 1, 0, 0);
+
             // Membuat akun sandbox KPR
             $acc = sandboxAcc::where('ref',Auth::user()->nrp)->first();
             if(is_null($acc)){
@@ -44,7 +45,7 @@ class SandboxController extends Controller
                     'pinjaman'=>$request->pinjaman,
                     'rekening'=>Carbon::now()->timestamp.'T',
                     'jk_waktu'=>$request->jangka,
-                    'tmt_angsuran'=> Carbon::now()
+                    'tmt_angsuran'=> $thisTime
                 ]);
             }
 
@@ -58,8 +59,12 @@ class SandboxController extends Controller
                 // return view('sandbox.index',['acc'=>$acc,'all' => $data[0],
                 // 'besar_angsuran' => $data[1],
                 // 'no' => intval($request->jk_waktu)]);
+                Alert::success(
+                    'Account telah terbuat',
+                    'Sandbox tidak memerlukan approve dari admin'
+                );
 
-                return redirect()->back()->with(['success'=>"akun sudah dibuat !"]);
+                return redirect()->back();
 
         }
 
@@ -142,7 +147,7 @@ class SandboxController extends Controller
                         $month = $bln < 10 ? "0{$bln}" : $bln;
                         $tanggal = "{$tahun}-{$month}-01";
 
-                       transaksiSandbox::create([
+                    transaksiSandbox::create([
                             'ref' => $kpr->ref,
                             'kodecabang' => '0018',
                             'tanggal' => $tanggal,
@@ -213,7 +218,7 @@ class SandboxController extends Controller
 
 
 
-     return response()->json(['message'=>'success'], 200);
+    return response()->json(['message'=>'success'], 200);
     }
 
 
@@ -259,6 +264,16 @@ class SandboxController extends Controller
             "utang_pokok" => $utang_bunga_total,
             "utang_bunga" => $utang_pokok_total,
         ];
+    }
+
+    public function sandbox_data(Request $request)
+    {
+        return response()->json(['kpr'=>sandboxAcc::all()], 200);;
+    }
+
+    public function trx_btn(Request $request)
+    {
+        return response()->json(['trx_btn'=>transaksiSandbox::all()], 200);
     }
 
 }

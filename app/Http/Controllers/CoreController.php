@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Excel;
+use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\Bulk;
+use App\Testbulk;
 
 use Illuminate\Support\Facades\DB;
 
@@ -18,17 +19,23 @@ class CoreController extends Controller
 
     public function store_bulk(Request $request)
     {
-        $file = $request->file('file');
-
-
-        $import = new Bulk();
-        $import->import($file);
+        // $file = $request->file('file');
+        $file =file($request->file->GetRealPath());
+        // dd(request()->file('file')->store('test_bulk'));
+        $data=Excel::import(new Bulk, request()->file('file')->store('test_bulk'));
+        dd($data);
+        // return back();
+        //  dd('ada');
+        // $import = new Bulk();
+        // $import->import($file);
         // $data = Excel::import(new Bulk, $file);
 
-        foreach ($import->failures() as $failure) {
-                dump("row ". $failure->row()." have error with error is ".$failure->errors()[0]);
+        // foreach ($import->failures() as $failure) {
+        //         dump("row ". $failure->row()." have error with error is ".$failure->errors()[0]);
+        // }
 
-       }
+
+
 
 
 

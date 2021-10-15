@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Detailkpr;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use App\Pinjaman;
 use PDF;
 use Carbon\Carbon;
@@ -14,6 +15,7 @@ use App\Exports\DetailkprExport;
 use App\Exports\RekapbulananExport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\User;
+use RealRashid\SweetAlert\Facades\Alert;
 class DetaildataController extends Controller
 {
 
@@ -73,6 +75,8 @@ class DetaildataController extends Controller
             return view('admin.datapinjaman.pending.index');
         } else if($approve == 'btn') {
             return view('admin.datapinjaman.btn.index');
+        } else if($approve == 'debitur') {
+            return view('admin.datapinjaman.debitur.index');
         } else if($approve == 'belomapprove') {
             return view('admin.datapinjaman.belomapprove.index');
         } else if($approve == 'lunas') {
@@ -91,6 +95,10 @@ class DetaildataController extends Controller
             return view('admin.datapinjaman.piutang.index');
         } else if($approve == 'history') {
             return view('admin.datapinjaman.history.index');
+        } else if($approve == 'carirekap') {
+            return view('admin.datapinjaman.carirekap.index');
+        } else if($approve == 'RekapBulanan') {
+            return route('/RekapBulanan');
         } else {
             return view('admin.datapinjaman.btn.index');
         }
@@ -148,7 +156,7 @@ class DetaildataController extends Controller
                 })->rawColumns(['update','nrp', 'nama','pangkat','kesatuan','kotama', 'pinjaman', 'jml_angs', 'jml_tunggakan'])
                 ->toJson();
         } else if ($approve == 'btn') {
-            $pinjams = $pinjams->where('status', 1)->orderBy('id', 'ASC');
+            $pinjams = $pinjams->where('status', 3)->orderBy('id', 'ASC');
             $data = DataTables::queryBuilder($pinjams)
                 ->addColumn('update', function($pinjam){
                     return '<a href="' . route('admin.detaildata.update.edit', $pinjam->id) . '" class="text-success">Update</a>';
@@ -171,11 +179,25 @@ class DetaildataController extends Controller
                     return "Rp. " . number_format($pinjam->jml_tunggakan, 0, ',', '.');
                 })->rawColumns(['update','nrp', 'nama','pangkat','kesatuan','kotama', 'pinjaman', 'jml_angs', 'jml_tunggakan'])
                 ->toJson();
-        }
-
-
-        // yang lain masih error bentar jam 12
-        else if ($approve == 'belumapprove') {
+        } else if ($approve == 'debitur') {
+            $pinjams = $pinjams->orderBy('id', 'ASC');
+            $data = DataTables::queryBuilder($pinjams)
+                ->addColumn('update', function($pinjam){
+                    return '<a href="' . route('admin.detaildata.update.edit', $pinjam->id) . '" class="text-success">Update</a>';
+                })
+                ->editColumn('nrp', function ($pinjam) {
+                    return '<span class="badge badge-light">' . $pinjam->nrp . '</span>';
+                })->editColumn('nama', function ($pinjam) {
+                    return '<a href="' . route('admin.detaildata.show', $pinjam->id) . '" class="text-primary">' . $pinjam->nama . '</a>';
+                })->editColumn('pinjaman', function ($pinjam) {
+                    return "IDR. " . number_format($pinjam->pinjaman, 0, ',', '.');
+                })->editColumn('jml_angs', function ($pinjam) {
+                    return "Rp. " . number_format($pinjam->jml_angs, 0, ',', '.');
+                })->editColumn('jml_tunggakan', function ($pinjam) {
+                    return "Rp. " . number_format($pinjam->jml_tunggakan, 0, ',', '.');
+                })->rawColumns(['update','nrp', 'nama', 'pinjaman', 'jml_angs', 'jml_tunggakan'])
+                ->toJson();
+        } else if ($approve == 'belumapprove') {
             $pinjams = $pinjams->where('status', 2)->orderBy('id', 'ASC');
             $data = DataTables::queryBuilder($pinjams)
                 ->addColumn('update', function($pinjam){
@@ -272,7 +294,9 @@ class DetaildataController extends Controller
                     return "IDR. " . number_format($pinjam->pinjaman, 0, ',', '.');
                 })->editColumn('tunggakan_bunga', function ($pinjam) {
                     return "Rp. " . number_format($pinjam->tunggakan_bunga, 0, ',', '.');
-                })->rawColumns(['nrp', 'nama', 'piutang_pokok', 'tunggakan_bunga', 'piutang_bunga', 'pinjaman', 'jml_angs', 'jml_tunggakan', 'pokok', 'bunga', 'tunggakan_pokok', 'inisial_pokok', 'inisial_bunga', 'sisa_pinjaman_pokok'])
+                })->editColumn('outstanding', function ($pinjam) {
+                    return 'Rp.'. number_format($pinjam->tunggakan_bunga + $pinjam->piutang_pokok, 0, ',', '.');
+                })->rawColumns(['nrp', 'nama', 'piutang_pokok', 'tunggakan_bunga', 'piutang_bunga', 'pinjaman', 'jml_angs', 'jml_tunggakan', 'pokok', 'bunga', 'tunggakan_pokok', 'inisial_pokok', 'inisial_bunga', 'sisa_pinjaman_pokok', 'outstanding'])
                 ->toJson();
         } else if ($approve == 'penerimaan') {
                 $pinjams = $pinjams->orderBy('id', 'ASC');
@@ -332,6 +356,12 @@ class DetaildataController extends Controller
         }
 
         return $data;
+    }
+
+    public function carirekap(Request $request)
+    {
+
+
     }
 
 
@@ -771,11 +801,12 @@ class DetaildataController extends Controller
         $current = Carbon::now()->toDateTimeString();
         return Excel::download(new DetailkprExport(), 'Detail kpr Global '.$current.' Export.xlsx');
     }
-    public function RekapbulananExportExcel()
+    public function RekapbulananExportExcel($bulan, $tahun)
     {
         ob_end_clean();
         ob_start();
-        $current = Carbon::now()->toDateTimeString();
-        return Excel::download(new RekapbulananExport(5, 2021),'REKAP KPR'.$current. ' Export.xlsx');
+        // $current = Carbon::now()->toDateTimeString();
+        return Excel::download(new RekapbulananExport($bulan, $tahun),'REKAP BULALAN KPR ' . ' Export.xlsx');
+
     }
 }
